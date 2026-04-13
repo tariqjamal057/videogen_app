@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "36261426044",
+    "project_id": "videogen-e5b7a",
+    "storage_bucket": "videogen-e5b7a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36261426044:android:23ef761005cd44aef86af9",
+        "android_client_info": {
+          "package_name": "com.videogen.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "36261426044-0cqt06udootq0vn96l2k9asn4261t7o4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.videogen.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "36261426044-11un14612nla3hju9f7rms9phkvggi6t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.videogen.app",
+            "certificate_hash": "95be356e373ff11010b2fe6157e48b4a3e978b68"
+          }
+        },
+        {
+          "client_id": "36261426044-a9lccmrg400pj1e1cpd7smecdi0jnclm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.videogen.app",
+            "certificate_hash": "7f007e042d6c97917adc8b17eb727b78fc1fdbf1"
+          }
+        },
+        {
+          "client_id": "36261426044-jpffd57qfrspj9uag355ldss4ov1otll.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFRci7f6NX0bIc6ULF9WKHPgEVEgxQduY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "36261426044-jpffd57qfrspj9uag355ldss4ov1otll.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
