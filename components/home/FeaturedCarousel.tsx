@@ -45,7 +45,7 @@ export default function FeaturedCarousel({
 
   const handlePress = (template: Template) => {
     router.push({
-      pathname: "/creation",
+      pathname: "/template-detail",
       params: {
         id: template.id,
         title: template.title,
@@ -53,6 +53,7 @@ export default function FeaturedCarousel({
         image: template.image,
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
+        prompt: template.prompt,
       },
     });
   };

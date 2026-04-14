@@ -149,7 +149,7 @@ export default function DiscoverScreen() {
 
   const handleTemplatePress = (template: Template) => {
     router.push({
-      pathname: "/creation",
+      pathname: "/template-detail",
       params: {
         id: template.id,
         title: template.title,
@@ -157,6 +157,7 @@ export default function DiscoverScreen() {
         image: template.image,
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
+        prompt: template.prompt,
       },
     });
   };
@@ -219,7 +220,7 @@ export default function DiscoverScreen() {
               setActiveTab={setActiveTab}
             />
           }
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent]}
           columnWrapperStyle={styles.columnWrapper}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
@@ -232,6 +233,38 @@ export default function DiscoverScreen() {
             )
           }
         />
+
+        <View style={styles.floatingFooter}>
+          <TouchableOpacity
+            style={styles.footerButton}
+            activeOpacity={0.9}
+            onPress={() => {}}
+          >
+            <LinearGradient
+              colors={["#002375", "#0047ED"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.footerGradient}
+            >
+              <Text style={styles.footerButtonText}>Generate a Image</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.footerButton}
+            activeOpacity={0.9}
+            onPress={() => {}}
+          >
+            <LinearGradient
+              colors={["#820036", "#FF006A"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.footerGradient}
+            >
+              <Text style={styles.footerButtonText}>Generate a Video</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     </View>
   );
@@ -294,7 +327,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   listContent: {
-    paddingBottom: 30,
+    // paddingBottom handled inline
   },
   columnWrapper: {
     justifyContent: "space-between",
@@ -322,7 +355,7 @@ const styles = StyleSheet.create({
   gridButtonContainer: {
     position: "absolute",
     bottom: 8,
-    right: 0,
+    right: 8,
   },
   useButton: {
     paddingHorizontal: 10,
@@ -340,5 +373,39 @@ const styles = StyleSheet.create({
   emptyText: {
     color: Colors.dark.textMuted,
     fontSize: 16,
+  },
+  floatingFooter: {
+    position: "absolute",
+    bottom: 60,
+    left: 20,
+    right: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "transparent",
+  },
+  footerButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    // height: 50,
+    borderRadius: 25,
+    overflow: "hidden",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  footerGradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+  },
+  footerButtonText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "700",
+    textAlign: "center",
   },
 });

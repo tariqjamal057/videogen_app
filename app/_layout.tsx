@@ -167,18 +167,24 @@ function RootLayoutNav({ loaded }: { loaded: boolean }) {
     if (isInitializing) return;
 
     const inAuthGroup =
-      segments[0] === "(tabs)" ||
+      !segments[0] ||
+      segments[0] === "ai-video" ||
+      segments[0] === "projects" ||
+      segments[0] === "settings" ||
       segments[0] === "project" ||
       segments[0] === "creation" ||
       segments[0] === "all-plans" ||
       segments[0] === "plans" ||
       segments[0] === "prompt-detail" ||
-      segments[0] === "purchase-history";
+      segments[0] === "purchase-history" ||
+      segments[0] === "template-detail" ||
+      segments[0] === "template-upload" ||
+      segments[0] === "generation-config";
 
     if (!isAuthenticated && inAuthGroup) {
       router.replace("/onboarding");
     } else if (isAuthenticated && segments[0] === "onboarding") {
-      router.replace("/(tabs)");
+      router.replace("/");
     }
   }, [isAuthenticated, segments, isInitializing]);
 
@@ -238,6 +244,18 @@ function RootLayoutNav({ loaded }: { loaded: boolean }) {
             />
             <Stack.Screen
               name="purchase-history"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="template-detail"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="template-upload"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="generation-config"
               options={{ headerShown: false }}
             />
           </Stack>
