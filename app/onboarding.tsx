@@ -2,13 +2,14 @@ import {
   GoogleSignin,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import React, { useEffect } from "react";
 import {
   ActivityIndicator,
+  Image,
+  ImageBackground,
   Linking,
   Platform,
   StyleSheet,
@@ -18,7 +19,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { GoogleLoginButton } from "../components/onboarding/GoogleLoginButton";
-import { OnboardingHeader } from "../components/onboarding/OnboardingHeader";
 import Colors from "../constants/Colors";
 import { Links } from "../constants/Links";
 import { auth } from "../lib/firebase";
@@ -113,56 +113,51 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={[
-          Colors.dark.gradientStart,
-          Colors.dark.gradientMiddle,
-          Colors.dark.gradientEnd,
-        ]}
+      <ImageBackground
+        source={require("../assets/images/onboardingBg.png")}
         style={styles.background}
-      />
-
-      <View style={styles.content}>
-        <OnboardingHeader />
-
-        {isProfileLoading ? (
-          <View style={{ height: 52, justifyContent: "center" }}>
-            <ActivityIndicator size="large" color={Colors.dark.primary} />
+        resizeMode="cover"
+      >
+        <View style={[styles.content, { paddingTop: insets.top + 60, paddingBottom: Math.max(insets.bottom, 40) }]}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("../assets/images/Clipzo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
-        ) : (
-          <GoogleLoginButton
-            onPress={handleGoogleLogin}
-            isLoading={isRegistering}
-          />
-        )}
 
-        <Text
-          style={[
-            styles.footerText,
-            {
-              bottom: Math.max(
-                insets.bottom,
-                Platform.OS === "android" ? 30 : 20
-              ),
-            },
-          ]}
-        >
-          By continuing, you agree to our{" "}
-          <Text
-            style={styles.linkText}
-            onPress={() => Linking.openURL(Links.terms)}
-          >
-            Terms
-          </Text>{" "}
-          and{" "}
-          <Text
-            style={styles.linkText}
-            onPress={() => Linking.openURL(Links.privacy)}
-          >
-            Privacy Policy
-          </Text>
-        </Text>
-      </View>
+          <View style={styles.bottomContainer}>
+            {isProfileLoading ? (
+              <View style={{ height: 52, justifyContent: "center" }}>
+                <ActivityIndicator size="large" color={Colors.dark.primary} />
+              </View>
+            ) : (
+              <GoogleLoginButton
+                onPress={handleGoogleLogin}
+                isLoading={isRegistering}
+              />
+            )}
+
+            <Text style={styles.footerText}>
+              By Signing in, you agree to our{" "}
+              <Text
+                style={styles.linkText}
+                onPress={() => Linking.openURL(Links.terms)}
+              >
+                Terms of Services
+              </Text>{" "}
+              and{" "}
+              <Text
+                style={styles.linkText}
+                onPress={() => Linking.openURL(Links.privacy)}
+              >
+                Privacy Policy
+              </Text>
+            </Text>
+          </View>
+        </View>
+      </ImageBackground>
     </View>
   );
 }
@@ -173,31 +168,40 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.background,
   },
   background: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    flex: 1,
   },
   content: {
     flex: 1,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 30,
+  },
+  logoContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 30,
+    width: "100%",
+  },
+  logo: {
+    width: 280,
+    height: 280,
+  },
+  bottomContainer: {
+    width: "100%",
+    alignItems: "center",
   },
   footerText: {
-    position: "absolute",
-    bottom: 40,
+    marginTop: 10,
     fontSize: 12,
-    color: Colors.dark.textDim,
+    color: "rgba(255, 255, 255, 0.7)",
     textAlign: "center",
-    paddingHorizontal: 40,
-    lineHeight: 16,
-    marginBottom: 5,
+    paddingHorizontal: 20,
+    lineHeight: 18,
+    marginBottom: 20,
   },
   linkText: {
-    color: Colors.dark.primary,
-    fontWeight: "400",
+    color: "#FFFFFF",
+    fontWeight: "bold",
     textDecorationLine: "underline",
   },
 });

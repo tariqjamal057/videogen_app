@@ -1,7 +1,7 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import React from "react";
 import {
   ActivityIndicator,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -30,9 +30,14 @@ export const GoogleLoginButton = ({
       ) : (
         <>
           <View style={styles.googleIconContainer}>
-            <FontAwesome name="google" size={20} color="#4285F4" />
+            <Image
+              source={{
+                uri: "https://img.icons8.com/color/48/000000/google-logo.png",
+              }}
+              style={styles.googleIcon}
+            />
           </View>
-          <Text style={styles.buttonText}>Continue with Google</Text>
+          <Text style={styles.buttonText}>Login with Google</Text>
         </>
       )}
     </TouchableOpacity>
@@ -45,9 +50,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.dark.white,
     height: 56,
-    borderRadius: 16,
+    borderRadius: 28,
     width: "100%",
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
     shadowColor: Colors.dark.black,
     shadowOffset: {
       width: 0,
@@ -56,18 +61,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 10,
+    marginBottom: 20,
   },
   googleIconContainer: {
-    width: 40,
-    height: 40,
+    width: 24,
+    height: 24,
     justifyContent: "center",
     alignItems: "center",
   },
+  googleIcon: {
+    width: 24,
+    height: 24,
+  },
   buttonText: {
-    color: Colors.dark.gray,
+    color: Colors.dark.black,
     fontSize: 17,
-    fontWeight: "500",
+    fontWeight: "600",
     flex: 1,
     textAlign: "center",
+    marginRight: 24, // to center text relative to the whole button considering the icon
   },
 });
