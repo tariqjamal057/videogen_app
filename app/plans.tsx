@@ -1,40 +1,56 @@
-import CloseButton from "@/components/common/CloseButton";
-import GradientButton from "@/components/common/GradientButton";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import React, { useState, useEffect } from "react";
 import {
   Dimensions,
-  Image,
-  Linking,
+  FlatList,
+  ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import PurchaseImage from "../assets/images/purchase.jpg";
-import { Skeleton } from "../components/common/Skeleton";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeader } from "../components/common/ScreenHeader";
 import Colors from "../constants/Colors";
-import { Links } from "../constants/Links";
+import { useGetPlansQuery, useGetTopTemplatesQuery } from "../store/api/apiSlice";
 import { useIAPFlow } from "../hooks/useIAP";
-import { useGetPlansQuery } from "../store/api/apiSlice";
-
-const { width, height } = Dimensions.get("window");
-
 import Toast from "react-native-toast-message";
+import { Skeleton } from "../components/common/Skeleton";
 
-export default function BestValueScreen() {
-  const insets = useSafeAreaInsets();
+const { width } = Dimensions.get("window");
+const ITEM_WIDTH = (width - 50) / 2;
+
+export default function SubscriptionScreen() {
   const router = useRouter();
-  const { data: plans, isLoading } = useGetPlansQuery();
+  const { data: plans, isLoading: isLoadingPlans } = useGetPlansQuery();
+  const { data: topTemplates, isLoading: isLoadingTop } = useGetTopTemplatesQuery({ limit: 5 });
   const { handlePurchase } = useIAPFlow();
+  
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
-  const plan = plans?.[0];
+  useEffect(() => {
+    if (plans && plans.length > 0 && !selectedPlanId) {
+      setSelectedPlanId(plans[0].id);
+    }
+  }, [plans]);
+
+  const selectedPlan = plans?.find(p => p.id === selectedPlanId);
+
   const onPurchase = async () => {
-    if (!plan) return;
+    if (!selectedPlan) {
+      Toast.show({
+        type: "error",
+        text1: "No Plan Selected",
+        text2: "Please select a plan to continue.",
+      });
+      return;
+    }
     try {
-      await handlePurchase(plan.playStorePlanId);
+      await handlePurchase(selectedPlan.playStorePlanId);
     } catch (error) {
       Toast.show({
         type: "error",
@@ -44,138 +60,122 @@ export default function BestValueScreen() {
     }
   };
 
-  if (isLoading) {
+  const renderPlanItem = ({ item }: { item: any }) => {
+    const isSelected = selectedPlanId === item.id;
     return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
-          style={styles.background}
-        />
-        <View style={styles.imageContainer}>
-          <Skeleton width="100%" height="100%" borderRadius={0} />
-        </View>
-        <View
-          style={[
-            styles.contentContainer,
-            { paddingBottom: insets.bottom || 24 },
-          ]}
-        >
-          <View style={styles.textSection}>
-            <View style={styles.featureList}>
-              {[1, 2, 3, 4].map((i) => (
-                <View key={i} style={styles.featureItem}>
-                  <Skeleton width={20} height={20} borderRadius={10} />
-                  <Skeleton
-                    width={200}
-                    height={16}
-                    borderRadius={8}
-                    style={{ marginLeft: 10 }}
-                  />
-                </View>
-              ))}
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => setSelectedPlanId(item.id)}
+        style={styles.planCardWrapper}
+      >
+        {isSelected ? (
+          <LinearGradient
+            colors={["#0044E0", "#F20165"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.selectedBorderGradient}
+          >
+            <View style={styles.planCardInner}>
+              <Text style={styles.planPrice}>₹{item.amount}</Text>
+              <Text style={styles.planCredits}>{item.credits} credit</Text>
             </View>
-            <View style={styles.priceContainer}>
-              <View style={styles.priceRow}>
-                <Skeleton width={120} height={32} borderRadius={16} />
-              </View>
-            </View>
+          </LinearGradient>
+        ) : (
+          <View style={styles.planCardInactive}>
+            <Text style={styles.planPrice}>₹{item.amount}</Text>
+            <Text style={styles.planCredits}>{item.credits} credit</Text>
           </View>
-          <View style={styles.buttonSection}>
-            <Skeleton width="100%" height={56} borderRadius={28} />
-            <View style={{ height: 20 }} />
-          </View>
-        </View>
-      </View>
+        )}
+      </TouchableOpacity>
     );
-  }
+  };
 
-  if (!plan) return null;
-
-  const features = plan.bulletPoints;
+  const renderSliderItem = ({ item }: { item: any }) => (
+    <View style={styles.sliderImageWrapper}>
+      <Image source={{ uri: item.image }} style={styles.sliderImage} resizeMode="cover" />
+    </View>
+  );
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
       <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
+        style={styles.background}
       />
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+        <ScreenHeader title="Subscription" />
 
-      <View style={styles.imageContainer}>
-        <Image source={PurchaseImage} style={styles.image} />
-        <LinearGradient
-          colors={[
-            "transparent",
-            "rgba(0,0,0,0.2)",
-            "rgba(0,0,0,0.7)",
-            Colors.dark.background,
-          ]}
-          style={styles.imageGradient}
-        />
-        <CloseButton
-          onPress={() => router.back()}
-          style={styles.closeButton}
-          variant="dark"
-          size={30}
-        />
-      </View>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          {/* Top Slider */}
+          <View style={styles.sliderContainer}>
+            <FlatList
+              data={topTemplates}
+              renderItem={renderSliderItem}
+              horizontal
+              pagingEnabled
+              snapToInterval={width * 0.6 + 20}
+              decelerationRate="fast"
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.sliderList}
+              keyExtractor={(item) => item.id}
+            />
+          </View>
 
-      <View
-        style={[
-          styles.contentContainer,
-          { paddingBottom: insets.bottom || 24 },
-        ]}
-      >
-        <View style={styles.textSection}>
-          <View style={styles.featureList}>
-            {features.map((feature, index) => (
-              <View key={index} style={styles.featureItem}>
-                <Ionicons
-                  name="checkmark"
-                  size={20}
-                  color={Colors.dark.white}
-                />
+          {/* Feature List */}
+          <View style={styles.featuresContainer}>
+            {(selectedPlan?.bulletPoints || [
+              "Create viral AI Videos from your Photos",
+              "Swap your face in your dream look",
+              "Make your photos move like magic",
+              "Get 5 credits FREE"
+            ]).map((feature, index) => (
+              <View key={index} style={styles.featureRow}>
+                <Ionicons name="checkmark" size={18} color="#FFF" />
                 <Text style={styles.featureText}>{feature}</Text>
               </View>
             ))}
           </View>
 
-          <View style={styles.priceContainer}>
-            <View style={styles.priceRow}>
-              <Text style={styles.priceAmount}>₹{plan.amount}</Text>
-              <Text style={styles.priceSlash}>/</Text>
-              <Text style={styles.priceCredits}>{plan.credits} Credits</Text>
-            </View>
+          {/* Plans Grid */}
+          <View style={styles.plansGridContainer}>
+            {isLoadingPlans ? (
+              <View style={styles.skeletonGrid}>
+                {[1, 2, 3, 4].map(i => (
+                  <Skeleton key={i} width={ITEM_WIDTH} height={100} borderRadius={16} />
+                ))}
+              </View>
+            ) : (
+              <FlatList
+                data={plans}
+                renderItem={renderPlanItem}
+                numColumns={2}
+                scrollEnabled={false}
+                keyExtractor={(item) => item.id}
+                columnWrapperStyle={styles.plansRow}
+              />
+            )}
           </View>
-        </View>
+        </ScrollView>
 
-        <View style={styles.buttonSection}>
-          <GradientButton onPress={onPurchase} title="Purchase" />
-
-          <TouchableOpacity
-            style={styles.showAllButton}
-            onPress={() => router.push("/all-plans")}
+        {/* Purchase Button */}
+        <View style={styles.footer}>
+          <TouchableOpacity 
+            activeOpacity={0.9} 
+            onPress={onPurchase}
+            style={styles.purchaseBtnWrapper}
           >
-            <Text style={styles.showAllText}>Show all plans</Text>
-            <Ionicons
-              name="caret-forward-outline"
-              size={12}
-              color={Colors.dark.textMuted}
-              style={styles.arrowIcon}
-            />
+            <LinearGradient
+              colors={["#0044E0", "#F20165"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.purchaseBtn}
+            >
+              <Text style={styles.purchaseBtnText}>Purchase</Text>
+            </LinearGradient>
           </TouchableOpacity>
-
-          <View style={styles.footer}>
-            <View style={styles.footerLinks}>
-              <TouchableOpacity onPress={() => Linking.openURL(Links.terms)}>
-                <Text style={styles.footerLink}>Terms</Text>
-              </TouchableOpacity>
-              <View style={styles.dot} />
-              <TouchableOpacity onPress={() => Linking.openURL(Links.privacy)}>
-                <Text style={styles.footerLink}>Privacy Policy</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
-      </View>
+      </SafeAreaView>
     </View>
   );
 }
@@ -183,156 +183,117 @@ export default function BestValueScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
+    backgroundColor: "#000",
   },
   background: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
   },
-  imageContainer: {
-    width: "100%",
-    height: height * 0.6,
-    position: "relative",
+  scrollContent: {
+    paddingBottom: 20,
   },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  imageGradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 150,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 30,
-    right: 20,
-  },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: "space-around",
-  },
-  textSection: {
-    alignItems: "center",
-  },
-  tagline: {
-    color: Colors.dark.primary,
-    fontSize: 12,
-    fontWeight: "600",
-    letterSpacing: 2,
-    marginBottom: 8,
-  },
-  featureList: {
-    gap: 4,
+  sliderContainer: {
+    height: 280,
     marginTop: 10,
   },
-  featureItem: {
-    flexDirection: "row",
-    alignItems: "center",
+  sliderList: {
+    paddingHorizontal: 20,
+    gap: 20,
   },
-  featureText: {
-    fontSize: 12,
-    color: Colors.dark.text,
-    marginLeft: 6,
-    fontWeight: "500",
-  },
-  priceContainer: {
-    marginTop: 20,
-  },
-  priceRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    justifyContent: "center",
-  },
-  priceAmount: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: Colors.dark.white,
-  },
-  priceSlash: {
-    fontSize: 20,
-    color: Colors.dark.textMuted,
-    fontWeight: "300",
-  },
-  priceCredits: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: Colors.dark.textMuted,
-  },
-  subPrice: {
-    fontSize: 12,
-    color: Colors.dark.primary,
-    fontWeight: "600",
-    marginTop: 4,
-  },
-  buttonSection: {
-    gap: 10,
-    paddingBottom: 4,
-  },
-  purchaseButton: {
-    width: "100%",
-    height: 56,
-    borderRadius: 28,
+  sliderImageWrapper: {
+    width: width * 0.6,
+    height: 260,
+    borderRadius: 24,
     overflow: "hidden",
-    shadowColor: Colors.dark.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    backgroundColor: "rgba(255,255,255,0.1)",
   },
-  purchaseGradient: {
+  sliderImage: {
     width: "100%",
     height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
   },
-  purchaseButtonText: {
-    color: Colors.dark.white,
-    fontSize: 18,
-    fontWeight: "600",
-    letterSpacing: 0.5,
+  featuresContainer: {
+    paddingHorizontal: 25,
+    marginTop: 10,
+    gap: 12,
   },
-  showAllButton: {
+  featureRow: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 10,
+  },
+  featureText: {
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "500",
+    opacity: 0.9,
+  },
+  plansGridContainer: {
+    paddingHorizontal: 20,
+    marginTop: 30,
+  },
+  plansRow: {
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  planCardWrapper: {
+    width: ITEM_WIDTH,
+    height: 100,
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  selectedBorderGradient: {
+    flex: 1,
+    padding: 2, // Border thickness
+  },
+  planCardInner: {
+    flex: 1,
+    backgroundColor: "#111",
+    borderRadius: 14,
     justifyContent: "center",
+    alignItems: "center",
   },
-  showAllText: {
-    fontSize: 12,
-    color: Colors.dark.textMuted,
-    fontWeight: "600",
+  planCardInactive: {
+    flex: 1,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
   },
-  arrowIcon: {
-    marginLeft: 2,
-    marginTop: 2,
+  planPrice: {
+    color: "#FFF",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  planCredits: {
+    color: "rgba(255,255,255,0.6)",
+    fontSize: 14,
+    marginTop: 4,
+  },
+  skeletonGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 15,
   },
   footer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 10,
+  },
+  purchaseBtnWrapper: {
+    height: 52,
+    borderRadius: 26,
+    overflow: "hidden",
+  },
+  purchaseBtn: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 15,
   },
-  footerLinks: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  footerLink: {
-    fontSize: 11,
-    color: Colors.dark.textMuted,
-    fontWeight: "500",
-    textDecorationLine: "underline",
-  },
-  dot: {
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
-    backgroundColor: Colors.dark.textDim,
-    marginHorizontal: 8,
+  purchaseBtnText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
