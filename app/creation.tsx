@@ -99,7 +99,7 @@ const TemplateDetailScreen = () => {
         body: formData,
         params: { isAiVideoTab: "false" },
       }).unwrap();
-      router.push("/(tabs)/projects");
+      router.push("/projects");
     } catch (error: any) {
       console.error("Failed to generate video:", error);
 

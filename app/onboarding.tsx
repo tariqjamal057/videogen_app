@@ -52,7 +52,7 @@ export default function OnboardingScreen() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/(tabs)");
+      router.replace("/");
     }
   }, [isAuthenticated]);
 
@@ -84,7 +84,7 @@ export default function OnboardingScreen() {
         );
       }
 
-      router.replace("/(tabs)");
+      router.replace("/");
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log("User cancelled the login flow");

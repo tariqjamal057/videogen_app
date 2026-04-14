@@ -234,7 +234,7 @@ export default function ProjectDetailScreen() {
         text2: "Creation re-queued successfully.",
       });
 
-      router.push("/(tabs)/projects");
+      router.push("/projects");
     } catch (error) {
       console.error("Retry error:", error);
       Toast.show({

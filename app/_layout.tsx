@@ -219,7 +219,9 @@ function RootLayoutNav({ loaded }: { loaded: boolean }) {
           >
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="ai-video" options={{ headerShown: false }} />
+            <Stack.Screen name="projects" options={{ headerShown: false }} />
+            <Stack.Screen name="settings" options={{ headerShown: false }} />
             <Stack.Screen
               name="creation"
               options={{ headerShown: false, presentation: "transparentModal" }}

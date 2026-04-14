@@ -11,15 +11,18 @@ import {
 } from "react-native";
 import Colors from "../../constants/Colors";
 import { Template } from "../../constants/Templates";
+import PrimaryButton from "../common/PrimaryButton";
 
 interface TemplateSectionProps {
   title: string;
   templates: Template[];
+  onSeeAll?: () => void;
 }
 
 export default function TemplateSection({
   title,
   templates,
+  onSeeAll,
 }: TemplateSectionProps) {
   const router = useRouter();
 
@@ -61,13 +64,27 @@ export default function TemplateSection({
         style={styles.gradient}
         locations={[0.7, 1]}
       />
-      <Text style={styles.title}>{item.title}</Text>
+      <View style={styles.buttonContainer}>
+        <PrimaryButton 
+          title="USE" 
+          onPress={() => handlePress(item)} 
+          style={styles.useButton}
+          textStyle={styles.useButtonText}
+        />
+      </View>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.header}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        {onSeeAll && (
+          <TouchableOpacity onPress={onSeeAll} activeOpacity={0.7}>
+            <Text style={styles.seeAll}>See all</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       <FlatList
         data={templates}
         renderItem={renderItem}
@@ -84,13 +101,23 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 20,
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginBottom: 15,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
     color: Colors.dark.white,
-    marginBottom: 15,
-    paddingHorizontal: 20,
     letterSpacing: 0.5,
+  },
+  seeAll: {
+    color: Colors.dark.textMuted,
+    fontSize: 14,
+    fontWeight: "500",
   },
   listContent: {
     paddingHorizontal: 15,
@@ -114,14 +141,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: "60%",
   },
-  title: {
+  buttonContainer: {
     position: "absolute",
-    bottom: 8,
-    left: 10,
-    right: 10,
-    color: Colors.dark.white,
-    fontWeight: "600",
-    fontSize: 14,
-    textAlign: "center",
+    bottom: 4,
+    right: 0,
+  },
+  useButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  useButtonText: {
+    fontSize: 10,
+    lineHeight: 14,
   },
 });

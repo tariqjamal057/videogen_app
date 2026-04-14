@@ -37,7 +37,7 @@ function PromptDetailScreen() {
 
   const handleUsePrompt = () => {
     dispatch(setPrompt(prompt as string));
-    router.replace("/(tabs)/ai-video");
+    router.replace("/ai-video");
   };
 
   return (

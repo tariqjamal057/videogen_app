@@ -3,10 +3,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { useSelector } from "react-redux";
 import Colors from "../../constants/Colors";
+import { selectCurrentUser } from "../../store/slices/authSlice";
 
 export default function UpgradeButton() {
   const router = useRouter();
+  const user = useSelector(selectCurrentUser);
+
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={() => router.push("/plans")}>
       <LinearGradient
@@ -17,10 +21,10 @@ export default function UpgradeButton() {
       >
         <MaterialIcons
           name="auto-awesome"
-          size={10}
+          size={12}
           color={Colors.dark.white}
         />
-        <Text style={styles.badgeText}>Credits</Text>
+        <Text style={styles.badgeText}>{user?.credits ?? 0}</Text>
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -30,9 +34,9 @@ const styles = StyleSheet.create({
   creditsBadge: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
     shadowColor: Colors.dark.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -41,11 +45,10 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: Colors.dark.white,
-    fontWeight: "700",
-    fontSize: 12,
+    fontWeight: "800",
+    fontSize: 14,
     letterSpacing: 0.5,
-    marginLeft: 3,
-    textTransform: "uppercase",
-    lineHeight: 16,
+    marginLeft: 5,
+    lineHeight: 18,
   },
 });
