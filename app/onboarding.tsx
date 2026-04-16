@@ -80,7 +80,7 @@ export default function OnboardingScreen() {
           setCredentials({
             user: result,
             token: firebaseToken,
-          })
+          }),
         );
       }
 
@@ -118,7 +118,15 @@ export default function OnboardingScreen() {
         style={styles.background}
         resizeMode="cover"
       >
-        <View style={[styles.content, { paddingTop: insets.top + 60, paddingBottom: Math.max(insets.bottom, 40) }]}>
+        <View
+          style={[
+            styles.content,
+            {
+              paddingTop: insets.top + 60,
+              paddingBottom: Math.max(insets.bottom, 40),
+            },
+          ]}
+        >
           <View style={styles.logoContainer}>
             <Image
               source={require("../assets/images/Clipzo.png")}
@@ -140,20 +148,8 @@ export default function OnboardingScreen() {
             )}
 
             <Text style={styles.footerText}>
-              By Signing in, you agree to our{" "}
-              <Text
-                style={styles.linkText}
-                onPress={() => Linking.openURL(Links.terms)}
-              >
-                Terms of Services
-              </Text>{" "}
-              and{" "}
-              <Text
-                style={styles.linkText}
-                onPress={() => Linking.openURL(Links.privacy)}
-              >
-                Privacy Policy
-              </Text>
+              By Signing in, you agree to our Terms of Services and Privacy
+              Policy
             </Text>
           </View>
         </View>
@@ -183,21 +179,21 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   logo: {
-    width: 280,
-    height: 280,
+    // width: 280,
+    height: 250,
   },
   bottomContainer: {
     width: "100%",
     alignItems: "center",
   },
   footerText: {
-    marginTop: 10,
-    fontSize: 12,
+    // marginTop: 10,
+    fontSize: 7,
     color: "rgba(255, 255, 255, 0.7)",
     textAlign: "center",
     paddingHorizontal: 20,
-    lineHeight: 18,
-    marginBottom: 20,
+    // lineHeight: 18,
+    // marginBottom: 5,
   },
   linkText: {
     color: "#FFFFFF",

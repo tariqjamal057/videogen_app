@@ -49,10 +49,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Colors.dark.white,
-    height: 56,
+    // height: 56,
     borderRadius: 28,
     width: "100%",
     paddingHorizontal: 20,
+    paddingVertical: 8,
     shadowColor: Colors.dark.black,
     shadowOffset: {
       width: 0,
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 10,
-    marginBottom: 20,
+    marginBottom: 7,
   },
   googleIconContainer: {
     width: 24,
@@ -75,8 +76,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.dark.black,
-    fontSize: 17,
-    fontWeight: "600",
+    fontSize: 12,
+    // fontWeight: "600",
     flex: 1,
     textAlign: "center",
     marginRight: 24, // to center text relative to the whole button considering the icon

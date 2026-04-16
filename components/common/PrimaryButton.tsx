@@ -57,15 +57,15 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   button: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 3.5,
     borderRadius: 20,
   },
   buttonText: {
     color: "#FFFFFF",
     fontWeight: "700",
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 8,
+    // lineHeight: 16,
     textAlign: "center",
   },
 });

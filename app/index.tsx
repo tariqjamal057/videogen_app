@@ -25,9 +25,9 @@ import {
 } from "../store/api/apiSlice";
 
 const { width } = Dimensions.get("window");
-const COLUMN_COUNT = 2;
-const GRID_SPACING = 15;
-const ITEM_WIDTH = (width - 40 - GRID_SPACING) / COLUMN_COUNT;
+const COLUMN_COUNT = 3;
+const GRID_SPACING = 10;
+const ITEM_WIDTH = (width - 30 - (GRID_SPACING * (COLUMN_COUNT - 1))) / COLUMN_COUNT;
 
 const CategorySkeleton = () => (
   <View style={{ marginBottom: 20 }}>
@@ -44,11 +44,11 @@ const CategorySkeleton = () => (
         justifyContent: "space-between",
       }}
     >
-      {[1, 2, 3, 4].map((i) => (
+      {[1, 2, 3, 4, 5, 6].map((i) => (
         <Skeleton
           key={i}
           width={ITEM_WIDTH}
-          height={220}
+          height={160}
           borderRadius={14}
           style={{ marginBottom: 15 }}
         />
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   },
   carouselContainer: {
     width: "100%",
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     marginTop: 10,
     backgroundColor: "transparent",
   },
@@ -331,11 +331,11 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
   },
   gridCard: {
     width: ITEM_WIDTH,
-    height: 220,
+    height: 160,
     borderRadius: 14,
     marginBottom: 15,
     overflow: "hidden",
@@ -354,17 +354,17 @@ const styles = StyleSheet.create({
   },
   gridButtonContainer: {
     position: "absolute",
-    bottom: 8,
-    right: 8,
+    bottom: 4,
+    right: -2,
   },
   useButton: {
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 3.5,
     borderRadius: 12,
   },
   useButtonText: {
-    fontSize: 10,
-    lineHeight: 14,
+    fontSize: 8,
+    // lineHeight: 14,
   },
   emptyContainer: {
     alignItems: "center",
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   },
   floatingFooter: {
     position: "absolute",
-    bottom: 60,
+    bottom: 20,
     left: 20,
     right: 20,
     flexDirection: "row",

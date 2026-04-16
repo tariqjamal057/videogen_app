@@ -82,7 +82,7 @@ export default function TemplateSection({
         <Text style={styles.sectionTitle}>{title}</Text>
         {onSeeAll && (
           <TouchableOpacity onPress={onSeeAll} activeOpacity={0.7}>
-            <Text style={styles.seeAll}>See all</Text>
+            <Text style={styles.seeAll}>SEE ALL</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -106,26 +106,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 15,
+    paddingHorizontal: 15,
+    marginBottom: 7,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 13,
+    // fontWeight: "600",
     color: Colors.dark.white,
     letterSpacing: 0.5,
   },
   seeAll: {
     color: Colors.dark.textMuted,
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 10,
+    // fontWeight: "500",
   },
   listContent: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
   },
   card: {
-    width: 160,
-    height: 220,
+    width: 110,
+    height: 150,
     borderRadius: 14,
     marginHorizontal: 5,
     overflow: "hidden",
@@ -149,11 +149,11 @@ const styles = StyleSheet.create({
   },
   useButton: {
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 3.5,
     borderRadius: 12,
   },
   useButtonText: {
-    fontSize: 10,
-    lineHeight: 14,
+    fontSize: 8,
+    // lineHeight: 14,
   },
 });

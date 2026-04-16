@@ -34,7 +34,7 @@ export default function HomeHeader({ style }: HomeHeaderProps) {
             {user?.profilePicture ? (
               <Image source={{ uri: user.profilePicture }} style={styles.avatar} />
             ) : (
-              <FontAwesome5 name="user-alt" size={16} color={Colors.dark.text} />
+              <FontAwesome5 name="user-alt" size={11} color={Colors.dark.text} />
             )}
           </View>
         </TouchableOpacity>
@@ -48,15 +48,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingHorizontal: 15,
+    paddingTop: 8,
+    paddingBottom: 6,
     width: "100%",
     zIndex: 10,
   },
   logo: {
-    width: 100,
-    height: 35,
+    width: 85,
+    height: 30,
   },
   rightSection: {
     flexDirection: "row",
@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   avatarContainer: {
-    width: 38,
-    height: 38,
+    width: 32,
+    height: 32,
     borderRadius: 19,
     backgroundColor: "rgba(255,255,255,0.15)",
     justifyContent: "center",

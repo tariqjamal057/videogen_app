@@ -13,8 +13,8 @@ import PrimaryButton from "../common/PrimaryButton";
 import { Skeleton } from "../common/Skeleton";
 
 const { width } = Dimensions.get("window");
-const CAROUSEL_WIDTH = width - 40;
-const CAROUSEL_HEIGHT = 200;
+const CAROUSEL_WIDTH = width - 35;
+const CAROUSEL_HEIGHT = 165;
 
 interface FeaturedCarouselProps {
   data?: Template[];
@@ -87,7 +87,7 @@ export default function FeaturedCarousel({
         snapToInterval={CAROUSEL_WIDTH}
         decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
-        style={{ backgroundColor: "#000000" }}
+        // style={{ backgroundColor: "#000000" }}
         onMomentumScrollEnd={(e) => {
           const index = Math.round(e.nativeEvent.contentOffset.x / CAROUSEL_WIDTH);
           setActiveIndex(index);
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   container: {
     height: CAROUSEL_HEIGHT,
     width: CAROUSEL_WIDTH,
-    backgroundColor: "#000000",
+    // backgroundColor: "#000000",
   },
   card: {
     width: CAROUSEL_WIDTH,

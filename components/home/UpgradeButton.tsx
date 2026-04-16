@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -14,15 +14,15 @@ export default function UpgradeButton() {
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={() => router.push("/plans")}>
       <LinearGradient
-        colors={Colors.dark.buttonGradient}
+        colors={["#0044E0", "#F20165"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.creditsBadge}
       >
-        <MaterialIcons
-          name="auto-awesome"
-          size={12}
-          color={Colors.dark.white}
+        <FontAwesome5
+          name="database"
+          size={11}
+          color={"#FFCD0F"}
         />
         <Text style={styles.badgeText}>{user?.credits ?? 0}</Text>
       </LinearGradient>
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 2,
     borderRadius: 20,
     shadowColor: Colors.dark.primary,
     shadowOffset: { width: 0, height: 2 },
@@ -45,8 +45,8 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: Colors.dark.white,
-    fontWeight: "800",
-    fontSize: 14,
+    // fontWeight: "800",
+    fontSize: 10,
     letterSpacing: 0.5,
     marginLeft: 5,
     lineHeight: 18,
