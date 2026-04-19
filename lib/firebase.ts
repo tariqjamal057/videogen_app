@@ -8,13 +8,13 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDqIBrnc5HKA25o9wLs-4A288I9QRPlsd0",
-  authDomain: "videogen-e5b7a.firebaseapp.com",
-  projectId: "videogen-e5b7a",
-  storageBucket: "videogen-e5b7a.firebasestorage.app",
-  messagingSenderId: "36261426044",
-  appId: "1:36261426044:web:680b82041aa86918f86af9",
-  measurementId: "G-S0GRHWGV2S",
+  apiKey: "AIzaSyAWMlli6bIVgO-hPrV_8PCHhokREKcoNGk",
+  authDomain: "clipzo-1009b.firebaseapp.com",
+  projectId: "clipzo-1009b",
+  storageBucket: "clipzo-1009b.firebasestorage.app",
+  messagingSenderId: "211053888115",
+  appId: "1:211053888115:web:1c3b0830567225beb2e006",
+  measurementId: "G-WCK50GPK9J"
 };
 
 export const app =

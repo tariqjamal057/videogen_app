@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -24,9 +24,9 @@ export function ScreenHeader({
         style={styles.backButton}
         activeOpacity={0.7}
       >
-        <MaterialIcons
-          name="chevron-left"
-          size={28}
+        <FontAwesome5
+          name="arrow-left"
+          size={18}
           color={Colors.dark.white}
         />
       </TouchableOpacity>
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: 30,
     backgroundColor: Colors.dark.whiteTranslucentLow,
     alignItems: "center",
     justifyContent: "center",
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "600",
+    // fontWeight: "600",
     color: Colors.dark.white,
     letterSpacing: -0.5,
   },

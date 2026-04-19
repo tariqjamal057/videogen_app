@@ -45,7 +45,7 @@ export default function FeaturedCarousel({
 
   const handlePress = (template: Template) => {
     router.push({
-      pathname: "/template-detail",
+      pathname: "/template-upload",
       params: {
         id: template.id,
         title: template.title,

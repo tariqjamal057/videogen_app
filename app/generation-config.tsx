@@ -100,7 +100,7 @@ export default function GenerationConfigScreen() {
       activeOpacity={0.8}
       onPress={() => {
         router.push({
-          pathname: "/template-detail",
+          pathname: "/template-upload",
           params: { ...item, inputCount: item.inputCount.toString() },
         });
       }}
@@ -230,59 +230,59 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   inputSection: {
-    padding: 20,
+    paddingHorizontal: 15,
   },
   label: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 14,
+    // fontWeight: "600",
     color: "#FFF",
-    marginBottom: 15,
+    marginBottom: 12,
   },
   textAreaWrapper: {
     backgroundColor: "rgba(255,255,255,0.05)",
     borderRadius: 20,
     padding: 15,
-    height: 180,
+    height: 220,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.1)",
-    marginBottom: 25,
+    marginBottom: 15,
   },
   textArea: {
     flex: 1,
     color: "#FFF",
-    fontSize: 14,
+    fontSize: 12.5,
     lineHeight: 20,
   },
   surpriseMeButton: {
     alignSelf: "flex-end",
     backgroundColor: "#FFF",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 20,
   },
   surpriseMeText: {
     color: "#000",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "700",
   },
   selectorRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 15,
   },
   selectorLabel: {
-    fontSize: 16,
+    fontSize: 13,
     color: "#FFF",
-    fontWeight: "500",
+    // fontWeight: "500",
   },
   btnGroup: {
     flexDirection: "row",
     gap: 8,
   },
   btn: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
     borderRadius: 20,
   },
   btnActive: {
@@ -292,8 +292,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.1)",
   },
   btnText: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 10,
+    // fontWeight: "600",
   },
   btnTextActive: {
     color: "#000",
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.5)",
   },
   mainGenerateButton: {
-    height: 50,
+    // height: 50,
     borderRadius: 25,
     overflow: "hidden",
     marginTop: 10,
@@ -314,26 +314,28 @@ const styles = StyleSheet.create({
   },
   mainGenerateText: {
     color: "#FFF",
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 14,
+    paddingVertical: 9,
+    // fontWeight: "700",
+
   },
   trendingHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-end",
     paddingHorizontal: 20,
     marginTop: 10,
     marginBottom: 15,
   },
   trendingTitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#FFF",
-    fontWeight: "600",
+    // fontWeight: "600",
   },
   seeAllText: {
-    fontSize: 12,
+    fontSize: 11,
     color: "rgba(255,255,255,0.5)",
-    fontWeight: "600",
+    // fontWeight: "600",
   },
   gridContainer: {
     paddingHorizontal: 20,

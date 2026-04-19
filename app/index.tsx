@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Dimensions,
   FlatList,
@@ -10,6 +10,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform ,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../components/common/PrimaryButton";
@@ -23,6 +24,8 @@ import {
   useGetTemplatesByCategoryQuery,
   useGetTopTemplatesQuery,
 } from "../store/api/apiSlice";
+import * as NavigationBar from 'expo-navigation-bar';
+
 
 const { width } = Dimensions.get("window");
 const COLUMN_COUNT = 3;
@@ -129,6 +132,14 @@ const ListHeader = React.memo(({
 
 export default function DiscoverScreen() {
   const router = useRouter();
+
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      NavigationBar.setVisibilityAsync("hidden");
+      NavigationBar.setBehaviorAsync("overlay-swipe");
+    }
+  }, []);
+
   const [activeTab, setActiveTab] = useState<"video" | "image">("video");
   const { data: categories, isLoading: isLoadingCategories } =
     useGetTemplatesByCategoryQuery();
@@ -149,7 +160,7 @@ export default function DiscoverScreen() {
 
   const handleTemplatePress = (template: Template) => {
     router.push({
-      pathname: "/template-detail",
+      pathname: "/template-upload",
       params: {
         id: template.id,
         title: template.title,
@@ -376,7 +387,7 @@ const styles = StyleSheet.create({
   },
   floatingFooter: {
     position: "absolute",
-    bottom: 20,
+    bottom: 15,
     left: 20,
     right: 20,
     flexDirection: "row",

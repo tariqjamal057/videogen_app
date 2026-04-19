@@ -117,7 +117,7 @@ export default function TemplateUploadScreen() {
                     </View>
                   ) : (
                     <View style={styles.placeholderContainer}>
-                      <MaterialCommunityIcons name="image-outline" size={40} color="rgba(255,255,255,0.6)" />
+                      <MaterialCommunityIcons name="image-outline" size={60} color="rgba(255,255,255,0.6)" />
                       <Text style={styles.uploadLabel}>Image {index + 1}</Text>
                     </View>
                   )}
@@ -166,11 +166,11 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   scrollContent: {
-    padding: 20,
+    paddingHorizontal: 15,
   },
   demoWrapper: {
     width: "100%",
-    height: height * 0.45,
+    height: height * 0.49,
     borderRadius: 24,
     overflow: "hidden",
     backgroundColor: Colors.dark.surface,
@@ -229,15 +229,15 @@ const styles = StyleSheet.create({
   },
   uploadLabel: {
     color: "rgba(255,255,255,0.6)",
-    fontSize: 14,
-    marginTop: 8,
+    fontSize: 12,
+    marginTop: 2,
     fontWeight: "500",
   },
   hintText: {
-    fontSize: 12,
+    fontSize: 8,
     color: Colors.dark.textMuted,
     textAlign: "center",
-    marginTop: 25,
+    marginTop: 8,
     lineHeight: 18,
     paddingHorizontal: 30,
   },
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   generateButton: {
     width: "100%",
-    height: 50,
+    height: 43,
     borderRadius: 25,
     overflow: "hidden",
   },
@@ -258,8 +258,8 @@ const styles = StyleSheet.create({
   },
   generateButtonText: {
     color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 14,
+    // fontWeight: "700",
   },
   disabledButton: {
     opacity: 0.5,

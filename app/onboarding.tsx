@@ -34,7 +34,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 GoogleSignin.configure({
   webClientId:
-    "36261426044-jpffd57qfrspj9uag355ldss4ov1otll.apps.googleusercontent.com",
+    "211053888115-st6ee0mmsgp4ai6fr5otvleg3ncjmb5b.apps.googleusercontent.com",
   offlineAccess: true,
 });
 

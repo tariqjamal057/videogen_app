@@ -177,7 +177,6 @@ function RootLayoutNav({ loaded }: { loaded: boolean }) {
       segments[0] === "plans" ||
       segments[0] === "prompt-detail" ||
       segments[0] === "purchase-history" ||
-      segments[0] === "template-detail" ||
       segments[0] === "template-upload" ||
       segments[0] === "generation-config";
 
@@ -244,10 +243,6 @@ function RootLayoutNav({ loaded }: { loaded: boolean }) {
             />
             <Stack.Screen
               name="purchase-history"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="template-detail"
               options={{ headerShown: false }}
             />
             <Stack.Screen
