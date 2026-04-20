@@ -149,13 +149,10 @@ export default function DiscoverScreen() {
   const filteredTemplates = useMemo(() => {
     if (!categories) return [];
 
-    const relevantCategories = categories.filter((cat) => {
-      const isImageCat = cat.title.toLowerCase().includes("image");
-      return activeTab === "image" ? isImageCat : !isImageCat;
-    });
-
-    const allTemplates = relevantCategories.flatMap((cat) => cat.templates);
-    return Array.from(new Map(allTemplates.map((t) => [t.id, t])).values());
+    const allTemplates = categories.flatMap((cat) => cat.templates);
+    const filtered = allTemplates.filter((t) => t.templateType === activeTab);
+    
+    return Array.from(new Map(filtered.map((t) => [t.id, t])).values());
   }, [categories, activeTab]);
 
   const handleTemplatePress = (template: Template) => {
@@ -169,6 +166,7 @@ export default function DiscoverScreen() {
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
         prompt: template.prompt,
+        templateType: template.templateType,
       },
     });
   };
@@ -202,6 +200,7 @@ export default function DiscoverScreen() {
           onPress={() => handleTemplatePress(item)}
           style={styles.useButton}
           textStyle={styles.useButtonText}
+          colors={item.templateType === "image" ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
         />
       </View>
     </TouchableOpacity>
@@ -249,7 +248,7 @@ export default function DiscoverScreen() {
           <TouchableOpacity
             style={styles.footerButton}
             activeOpacity={0.9}
-            onPress={() => {}}
+            onPress={() => router.push({ pathname: "/generation-config", params: { isImage: "true" } })}
           >
             <LinearGradient
               colors={["#002375", "#0047ED"]}
@@ -264,7 +263,7 @@ export default function DiscoverScreen() {
           <TouchableOpacity
             style={styles.footerButton}
             activeOpacity={0.9}
-            onPress={() => {}}
+            onPress={() => router.push({ pathname: "/generation-config", params: { isImage: "false" } })}
           >
             <LinearGradient
               colors={["#820036", "#FF006A"]}

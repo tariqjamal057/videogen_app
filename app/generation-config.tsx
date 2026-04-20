@@ -39,8 +39,9 @@ const surpriseMePrompts = [
 export default function GenerationConfigScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { id, selectedImages: selectedImagesStr, prompt: initialPrompt } = params;
+  const { id, selectedImages: selectedImagesStr, prompt: initialPrompt, isImage, templateType } = params;
   
+  const isImageGen = isImage === "true" || templateType === "image";
   const selectedImages = JSON.parse(selectedImagesStr as string || "[]");
   const [prompt, setPrompt] = useState((initialPrompt as string) || "");
   const [quality, setQuality] = useState<"Normal" | "High">("Normal");
@@ -66,7 +67,9 @@ export default function GenerationConfigScreen() {
       formData.append("prompt", prompt);
       formData.append("useOnlyPrompt", id ? "false" : "true");
       formData.append("quality", quality.toLowerCase());
-      formData.append("duration", duration.split(" ")[0]);
+      if (!isImageGen) {
+        formData.append("duration", duration.split(" ")[0]);
+      }
 
       selectedImages.forEach((uri: string, index: number) => {
         if (uri) {
@@ -83,13 +86,13 @@ export default function GenerationConfigScreen() {
 
       await generateVideo({
         body: formData,
-        params: { isAiVideoTab: "false" },
+        params: { isAiVideoTab: isImageGen ? "true" : "false" },
       }).unwrap();
       
       router.push("/projects");
     } catch (error: any) {
-      console.error("Failed to generate video:", error);
-      const errorMessage = error?.data?.msg || error?.msg || "Failed to generate video.";
+      console.error("Failed to generate:", error);
+      const errorMessage = error?.data?.msg || error?.msg || `Failed to generate ${isImageGen ? "image" : "video"}.`;
       Toast.show({ type: "error", text1: "Error", text2: errorMessage });
     }
   };
@@ -123,7 +126,7 @@ export default function GenerationConfigScreen() {
       />
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <ScreenHeader 
-          title="Generate a Video" 
+          title={isImageGen ? "Generate an Image" : "Generate a Video"} 
           renderRight={() => <UpgradeButton />}
         />
         
@@ -164,29 +167,33 @@ export default function GenerationConfigScreen() {
                 </View>
               </View>
 
-              <View style={styles.selectorRow}>
-                <Text style={styles.selectorLabel}>Time</Text>
-                <View style={styles.btnGroup}>
-                  {["5 Sec", "10 Sec", "15 Sec"].map((t) => (
-                    <TouchableOpacity
-                      key={t}
-                      style={[styles.btn, duration === t ? styles.btnActive : styles.btnInactive]}
-                      onPress={() => setDuration(t as any)}
-                    >
-                      <Text style={[styles.btnText, duration === t ? styles.btnTextActive : styles.btnTextInactive]}>{t}</Text>
-                    </TouchableOpacity>
-                  ))}
+              {!isImageGen && (
+                <View style={styles.selectorRow}>
+                  <Text style={styles.selectorLabel}>Time</Text>
+                  <View style={styles.btnGroup}>
+                    {["5 Sec", "10 Sec", "15 Sec"].map((t) => (
+                      <TouchableOpacity
+                        key={t}
+                        style={[styles.btn, duration === t ? styles.btnActive : styles.btnInactive]}
+                        onPress={() => setDuration(t as any)}
+                      >
+                        <Text style={[styles.btnText, duration === t ? styles.btnTextActive : styles.btnTextInactive]}>{t}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
                 </View>
-              </View>
+              )}
 
               <TouchableOpacity style={styles.mainGenerateButton} onPress={handleGenerate} disabled={isGenerating}>
                 <LinearGradient
-                  colors={["#820036", "#FF006A"]}
+                  colors={isImageGen ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.mainGenerateGradient}
                 >
-                  <Text style={styles.mainGenerateText}>{isGenerating ? "Generating..." : "Generate Video"}</Text>
+                  <Text style={styles.mainGenerateText}>
+                    {isGenerating ? "Generating..." : (isImageGen ? "Generate Image" : "Generate Video")}
+                  </Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>

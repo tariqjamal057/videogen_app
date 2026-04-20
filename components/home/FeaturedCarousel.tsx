@@ -54,6 +54,7 @@ export default function FeaturedCarousel({
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
         prompt: template.prompt,
+        templateType: template.templateType,
       },
     });
   };
@@ -72,7 +73,11 @@ export default function FeaturedCarousel({
         style={styles.gradient}
       />
       <View style={styles.content}>
-        <PrimaryButton title="USE" onPress={() => handlePress(item)} />
+        <PrimaryButton 
+          title="USE" 
+          onPress={() => handlePress(item)} 
+          colors={item.templateType === "image" ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
+        />
       </View>
     </View>
   );

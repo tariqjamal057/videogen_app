@@ -14,18 +14,20 @@ import { FILE_BASE_URL } from "../../store/api/apiSlice";
 
 interface ProjectVideoPreviewProps {
   thumbnail: string;
-  videoUrl?: string | null;
+  mediaUrl?: string | null;
   orientation: "portrait" | "landscape";
   aspectRatio?: number;
   isFailed?: boolean;
+  isImage?: boolean;
 }
 
 export const ProjectVideoPreview = ({
   thumbnail: initialThumbnail,
-  videoUrl,
+  mediaUrl,
   orientation,
   aspectRatio: manualAspectRatio,
   isFailed,
+  isImage,
 }: ProjectVideoPreviewProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
@@ -35,16 +37,17 @@ export const ProjectVideoPreview = ({
 
   useEffect(() => {
     async function getThumbnail() {
+      if (isImage) return;
       // Skip if already have a local extracted thumbnail or if failed
       if (initialThumbnail?.startsWith("file://")) {
         return;
       }
 
-      if (videoUrl && !isFailed) {
+      if (mediaUrl && !isFailed) {
         // Ensure absolute URL
-        const absoluteUrl = videoUrl.startsWith("http")
-          ? videoUrl
-          : `${FILE_BASE_URL}${videoUrl}`;
+        const absoluteUrl = mediaUrl.startsWith("http")
+          ? mediaUrl
+          : `${FILE_BASE_URL}${mediaUrl}`;
 
         try {
           const { uri } = await VideoThumbnails.getThumbnailAsync(absoluteUrl, {
@@ -57,7 +60,7 @@ export const ProjectVideoPreview = ({
       }
     }
     getThumbnail();
-  }, [videoUrl, isFailed, initialThumbnail]);
+  }, [mediaUrl, isFailed, initialThumbnail, isImage]);
 
   // Determine effective aspect ratio and width
   const isPortrait = manualAspectRatio
@@ -92,9 +95,9 @@ export const ProjectVideoPreview = ({
   }, [player]);
 
   const handlePlay = () => {
-    if (!videoUrl || isFailed) return;
+    if (!mediaUrl || isFailed || isImage) return;
     setIsBuffering(true);
-    player.replace(videoUrl);
+    player.replace(mediaUrl);
     setIsPlaying(true);
     player.play();
   };
@@ -111,7 +114,7 @@ export const ProjectVideoPreview = ({
         },
       ]}
     >
-      {isPlaying && videoUrl && !isFailed ? (
+      {isPlaying && mediaUrl && !isFailed && !isImage ? (
         <View style={styles.preview}>
           <VideoView
             player={player}
@@ -155,30 +158,32 @@ export const ProjectVideoPreview = ({
               />
             </View>
           )}
-          <TouchableOpacity
-            style={[styles.playOverlay, isFailed && styles.failedOverlay]}
-            activeOpacity={0.8}
-            onPress={handlePlay}
-            disabled={!videoUrl || isFailed}
-          >
-            <View
-              style={[styles.playButton, isFailed && styles.failedPlayButton]}
+          {!isImage && (
+            <TouchableOpacity
+              style={[styles.playOverlay, isFailed && styles.failedOverlay]}
+              activeOpacity={0.8}
+              onPress={handlePlay}
+              disabled={!mediaUrl || isFailed}
             >
-              {isFailed ? (
-                <Ionicons
-                  name="alert-circle"
-                  size={40}
-                  color={Colors.dark.white}
-                />
-              ) : (
-                <MaterialIcons
-                  name="play-arrow"
-                  size={40}
-                  color={Colors.dark.white}
-                />
-              )}
-            </View>
-          </TouchableOpacity>
+              <View
+                style={[styles.playButton, isFailed && styles.failedPlayButton]}
+              >
+                {isFailed ? (
+                  <Ionicons
+                    name="alert-circle"
+                    size={40}
+                    color={Colors.dark.white}
+                  />
+                ) : (
+                  <MaterialIcons
+                    name="play-arrow"
+                    size={40}
+                    color={Colors.dark.white}
+                  />
+                )}
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </View>

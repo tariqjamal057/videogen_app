@@ -56,26 +56,43 @@ export default function ProjectDetailScreen() {
     url: p_url,
     gifUrl: p_gifUrl,
     templateId: p_templateId,
+    templateType: p_templateType,
     extractedThumbnail: p_extractedThumbnail,
     thumbnail: p_thumbnail,
   } = useLocalSearchParams();
 
-  const [currentStatus, setCurrentStatus] = React.useState<number>(
+  // Let's re-read the state part carefully.
+  const [currentStatusState, setCurrentStatusState] = React.useState<number>(
     p_status ? parseInt(p_status as string) : 1
   );
 
   const { data: project } = useGetVideoStatusQuery(id as string, {
     skip: !id,
-    pollingInterval: currentStatus === 1 ? 10000 : 0,
+    pollingInterval: currentStatusState === 1 ? 10000 : 0,
   });
 
   const [generateVideo, { isLoading: isRetrying }] = useGenerateVideoMutation();
 
   React.useEffect(() => {
     if (project?.status) {
-      setCurrentStatus(project.status);
+      setCurrentStatusState(project.status);
     }
   }, [project?.status]);
+
+  const isImage = React.useMemo(() => {
+    // 1. Check project data if available
+    if (project) {
+      if (project.uuid?.startsWith("img_")) return true;
+      if (typeof project.templateId === "object" && (project.templateId as any)?.templateType === "image") return true;
+      if ((project as any).templateType === "image") return true;
+    }
+
+    // 2. Check navigation params as fallback
+    if (p_templateType === "image") return true;
+    if (id?.toString().startsWith("img_")) return true;
+
+    return false;
+  }, [project, p_templateType, id]);
 
   // Use API data if available, otherwise fallback to navigation params
   const currentPrompt = project?.prompt || (p_prompt as string) || "";
@@ -85,7 +102,7 @@ export default function ProjectDetailScreen() {
       ? (project.templateId as any)
       : null;
 
-  const currentTitle = templateData?.name || currentPrompt || "Untitled Video";
+  const currentTitle = templateData?.name || currentPrompt || (isImage ? "Untitled Image" : "Untitled Video");
   const currentDescription = project?.templateId
     ? templateData?.description || (templateData ? "" : currentPrompt)
     : "";
@@ -122,7 +139,7 @@ export default function ProjectDetailScreen() {
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: "Video URL not found",
+        text2: `${isImage ? "Image" : "Video"} URL not found`,
       });
       return;
     }
@@ -135,12 +152,13 @@ export default function ProjectDetailScreen() {
         Toast.show({
           type: "info",
           text1: "Permission Denied",
-          text2: "We need permission to save videos to your gallery.",
+          text2: `We need permission to save ${isImage ? "images" : "videos"} to your gallery.`,
         });
         return;
       }
 
-      const fileName = `VideoGen_${Date.now()}.mp4`;
+      const ext = isImage ? "webp" : "mp4";
+      const fileName = `${isImage ? "ImageGen" : "VideoGen"}_${Date.now()}.${ext}`;
       const fileUri = (FS.documentDirectory || FS.cacheDirectory) + fileName;
       const downloadResult = await FS.downloadAsync(currentUrl, fileUri);
 
@@ -149,17 +167,17 @@ export default function ProjectDetailScreen() {
         Toast.show({
           type: "success",
           text1: "Success",
-          text2: "Video saved to gallery!",
+          text2: `${isImage ? "Image" : "Video"} saved to gallery!`,
         });
       } else {
-        throw new Error("Failed to download video");
+        throw new Error(`Failed to download ${isImage ? "image" : "video"}`);
       }
     } catch (error) {
       console.error("Download error:", error);
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: "Failed to download video. Please try again.",
+        text2: `Failed to download ${isImage ? "image" : "video"}. Please try again.`,
       });
     } finally {
       setIsDownloading(false);
@@ -224,9 +242,8 @@ export default function ProjectDetailScreen() {
 
       await generateVideo({
         body: formData,
-        params: project?.templateId ? undefined : { isAiVideoTab: "true" },
+        params: { isAiVideoTab: isImage ? "true" : "false" },
       }).unwrap();
-      // console.log(formData, project?.templateId ? undefined : { isAiVideoTab: "true" }, 'formdata')
 
       Toast.show({
         type: "success",
@@ -283,9 +300,9 @@ export default function ProjectDetailScreen() {
       (p_extractedThumbnail as string) ||
       "",
     status:
-      currentStatus === 2
+      currentStatusState === 2
         ? "Completed"
-        : currentStatus === 3
+        : currentStatusState === 3
         ? "Failed"
         : "Processing",
     date: (() => {
@@ -304,7 +321,7 @@ export default function ProjectDetailScreen() {
     orientation: orientation,
     aspectRatio: aspectRatio,
     progress: project?.progress ?? 0,
-    isFailed: currentStatus === 3,
+    isFailed: currentStatusState === 3,
   };
 
   return (
@@ -317,7 +334,7 @@ export default function ProjectDetailScreen() {
         <ScreenHeader
           title="Creation Details"
           renderRight={() => {
-            if (mappedProject.status === "Completed") {
+            if (currentStatusState === 2) {
               return (
                 <TouchableOpacity
                   onPress={() => setReportModalVisible(true)}
@@ -341,10 +358,11 @@ export default function ProjectDetailScreen() {
         >
           <ProjectVideoPreview
             thumbnail={mappedProject.thumbnail}
-            videoUrl={currentUrl}
+            mediaUrl={currentUrl}
             orientation={mappedProject.orientation as any}
             aspectRatio={mappedProject.aspectRatio}
             isFailed={mappedProject.isFailed}
+            isImage={isImage}
           />
 
           <View style={styles.content}>
@@ -377,9 +395,9 @@ export default function ProjectDetailScreen() {
             />
           ) : (
             <GradientButton
-              title={isDownloading ? "Downloading..." : "Download Video"}
+              title={isDownloading ? "Downloading..." : `Download ${isImage ? "Image" : "Video"}`}
               icon="file-download"
-              disabled={currentStatus !== 2 || isDownloading}
+              disabled={currentStatusState !== 2 || isDownloading}
               onPress={handleDownload}
             />
           )}

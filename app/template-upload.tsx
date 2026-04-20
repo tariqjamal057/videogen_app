@@ -18,16 +18,24 @@ import Toast from "react-native-toast-message";
 import { ScreenHeader } from "../components/common/ScreenHeader";
 import Colors from "../constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useGetTopTemplatesQuery } from "../store/api/apiSlice";
+import { Template } from "../constants/Templates";
 
 const { width, height } = Dimensions.get("window");
+const HORIZONTAL_PADDING = 12;
+const GAP = 10;
+const ITEM_WIDTH_SMALL = (width - (HORIZONTAL_PADDING * 2) - (GAP * 3)) / 4;
 
 export default function TemplateUploadScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { id, title, image, inputCount } = params;
+  const { id, title, image, inputCount, templateType } = params;
 
   const count = parseInt(inputCount as string) || 1;
   const [selectedImages, setSelectedImages] = useState<string[]>(new Array(count).fill(""));
+
+  const { data: topTemplates } = useGetTopTemplatesQuery();
+  const relatedTemplates = topTemplates?.filter(t => t.templateType === 'image' && t.id !== id) || [];
 
   const handlePickImage = async (index: number) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -79,6 +87,52 @@ export default function TemplateUploadScreen() {
     });
   };
 
+  const handleRelatedTemplatePress = (template: Template) => {
+    router.replace({
+      pathname: "/template-upload",
+      params: {
+        id: template.id,
+        title: template.title,
+        description: template.description,
+        image: template.image,
+        inputType: template.inputType,
+        inputCount: template.inputCount.toString(),
+        prompt: template.prompt,
+        templateType: template.templateType,
+      },
+    });
+  };
+
+  const renderUploadBox = (index: number, isSmall: boolean = false) => {
+    const uri = selectedImages[index];
+    return (
+      <TouchableOpacity
+        key={index}
+        style={[styles.uploadBox, isSmall && styles.uploadBoxSmall]}
+        onPress={() => (uri ? handleRemoveImage(index) : handlePickImage(index))}
+        activeOpacity={0.8}
+      >
+        {uri ? (
+          <View style={styles.selectedImageContainer}>
+            <Image source={{ uri }} style={styles.selectedImage} />
+            <View style={styles.removeBadge}>
+              <MaterialCommunityIcons name="close" size={14} color="#FFF" />
+            </View>
+          </View>
+        ) : (
+          <View style={styles.placeholderContainer}>
+            <MaterialCommunityIcons 
+              name="image-outline" 
+              size={isSmall ? 30 : 60} 
+              color="rgba(255,255,255,0.6)" 
+            />
+            <Text style={[styles.uploadLabel, isSmall && { fontSize: 8 }]}>Image {index + 1}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -90,7 +144,10 @@ export default function TemplateUploadScreen() {
         <ScreenHeader title={title as string} />
         
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          <View style={styles.demoWrapper}>
+          <View style={[
+            styles.demoWrapper,
+            { height: templateType === 'image' ? height * 0.65 : height * 0.45 }
+          ]}>
             <Image
               source={{ uri: image as string }}
               style={styles.demoImage}
@@ -100,33 +157,44 @@ export default function TemplateUploadScreen() {
           </View>
 
           <View style={styles.uploadSection}>
-            <View style={styles.uploadGrid}>
-              {selectedImages.map((uri, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.uploadBox}
-                  onPress={() => (uri ? handleRemoveImage(index) : handlePickImage(index))}
-                  activeOpacity={0.8}
-                >
-                  {uri ? (
-                    <View style={styles.selectedImageContainer}>
-                      <Image source={{ uri }} style={styles.selectedImage} />
-                      <View style={styles.removeBadge}>
-                        <MaterialCommunityIcons name="close" size={14} color="#FFF" />
-                      </View>
-                    </View>
-                  ) : (
-                    <View style={styles.placeholderContainer}>
-                      <MaterialCommunityIcons name="image-outline" size={60} color="rgba(255,255,255,0.6)" />
-                      <Text style={styles.uploadLabel}>Image {index + 1}</Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
+            {templateType === 'image' ? (
+              <View style={styles.imageTypeContainer}>
+                <View>
+                  <Text style={styles.sectionLabel}>Use Image</Text>
+                  {renderUploadBox(0, true)}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.sectionLabel}>More images</Text>
+                  <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false} 
+                    contentContainerStyle={styles.horizontalScrollOnlyTemplates}
+                  >
+                    {relatedTemplates.map((item) => (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={styles.templateBoxSmall}
+                        onPress={() => handleRelatedTemplatePress(item)}
+                        activeOpacity={0.8}
+                      >
+                        <Image
+                          source={{ uri: item.image }}
+                          style={styles.relatedImage}
+                          contentFit="cover"
+                        />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.uploadGrid}>
+                {selectedImages.map((_, index) => renderUploadBox(index))}
+              </View>
+            )}
             
             <Text style={styles.hintText}>
-              Upload your images in these boxes to create a video like this.
+              Upload your images in these boxes to create a {templateType === 'image' ? 'image' : 'video'} like this.
             </Text>
           </View>
         </ScrollView>
@@ -139,12 +207,14 @@ export default function TemplateUploadScreen() {
             activeOpacity={0.9}
           >
             <LinearGradient
-              colors={["#820036", "#FF006A"]}
+              colors={templateType === "image" ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.generateGradient}
             >
-              <Text style={styles.generateButtonText}>Generate Video</Text>
+              <Text style={styles.generateButtonText}>
+                {templateType === "image" ? "Generate Image" : "Generate Video"}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -166,15 +236,15 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   scrollContent: {
-    paddingHorizontal: 15,
+    paddingHorizontal: HORIZONTAL_PADDING,
   },
   demoWrapper: {
     width: "100%",
-    height: height * 0.49,
-    borderRadius: 24,
+    height: height * 0.45,
+    borderRadius: 20,
     overflow: "hidden",
     backgroundColor: Colors.dark.surface,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   demoImage: {
     width: "100%",
@@ -183,24 +253,57 @@ const styles = StyleSheet.create({
   uploadSection: {
     alignItems: "center",
   },
+  imageTypeContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    width: "100%",
+    gap: GAP,
+  },
+  sectionLabel: {
+    color: "rgba(255,255,255,0.6)",
+    fontSize: 10,
+    marginBottom: 6,
+    fontWeight: "500",
+  },
   uploadGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     width: "100%",
-    gap: 15,
+    gap: 10,
+  },
+  horizontalScrollOnlyTemplates: {
+    gap: GAP,
+    paddingRight: HORIZONTAL_PADDING,
   },
   uploadBox: {
-    flex: 1,
-    aspectRatio: 1,
-    minWidth: "45%",
     backgroundColor: "rgba(255,255,255,0.08)",
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.15)",
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+    aspectRatio: 1,
+    minWidth: "48%",
+  },
+  uploadBoxSmall: {
+    width: ITEM_WIDTH_SMALL,
+    height: ITEM_WIDTH_SMALL,
+    minWidth: ITEM_WIDTH_SMALL,
+  },
+  templateBoxSmall: {
+    width: ITEM_WIDTH_SMALL,
+    height: ITEM_WIDTH_SMALL,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  relatedImage: {
+    width: "100%",
+    height: "100%",
   },
   selectedImageContainer: {
     width: "100%",
@@ -230,7 +333,6 @@ const styles = StyleSheet.create({
   uploadLabel: {
     color: "rgba(255,255,255,0.6)",
     fontSize: 12,
-    marginTop: 2,
     fontWeight: "500",
   },
   hintText: {
@@ -259,7 +361,6 @@ const styles = StyleSheet.create({
   generateButtonText: {
     color: "#FFFFFF",
     fontSize: 14,
-    // fontWeight: "700",
   },
   disabledButton: {
     opacity: 0.5,

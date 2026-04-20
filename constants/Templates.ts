@@ -4,6 +4,7 @@ export interface Template {
   description: string;
   image: string;
   inputType: "text" | "image";
+  templateType: "video" | "image";
   inputCount: number;
   prompt: string;
 }

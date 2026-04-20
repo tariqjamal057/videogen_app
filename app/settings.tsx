@@ -99,11 +99,35 @@ export default function ProfileScreen() {
   const renderVideoItem = ({ item: video }: { item: any }) => {
     const isProcessing = video.status !== 2 && video.status !== 3;
     const progress = video.progress || 0;
+    const isImage = 
+      video.uuid?.startsWith("img_") || 
+      (typeof video.templateId === "object" && video.templateId?.templateType === "image") ||
+      video.templateType === "image";
 
     return (
-      <View style={styles.videoCard}>
+      <TouchableOpacity 
+        style={styles.videoCard} 
+        activeOpacity={0.9}
+        onPress={() => {
+          router.push({
+            pathname: "/project/[id]",
+            params: {
+              id: video._id,
+              prompt: video.prompt,
+              status: video.status.toString(),
+              createdAt: video.createdAt,
+              inputImages: JSON.stringify(video.inputImages || []),
+              url: video.url || "",
+              gifUrl: video.gifUrl || "",
+              templateId: typeof video.templateId === 'object' ? video.templateId?._id : (video.templateId || ""),
+              templateType: typeof video.templateId === 'object' ? video.templateId?.templateType : (video.templateType || ""),
+              thumbnail: video.thumbnail || ""
+            }
+          });
+        }}
+      >
         <Image
-          source={{ uri: video.inputImages?.[0] || video.thumbnail }}
+          source={{ uri: video.url || video.inputImages?.[0] || video.thumbnail }}
           style={styles.videoThumbnail}
           resizeMode="cover"
         />
@@ -123,7 +147,26 @@ export default function ProfileScreen() {
         ) : (
           <View style={styles.actionOverlay}>
             <View style={styles.actionButtons}>
-              <TouchableOpacity style={styles.iconCircle}>
+              <TouchableOpacity 
+                style={styles.iconCircle}
+                onPress={() => {
+                   router.push({
+                    pathname: "/project/[id]",
+                    params: {
+                      id: video._id,
+                      prompt: video.prompt,
+                      status: video.status.toString(),
+                      createdAt: video.createdAt,
+                      inputImages: JSON.stringify(video.inputImages || []),
+                      url: video.url || "",
+                      gifUrl: video.gifUrl || "",
+                      templateId: typeof video.templateId === 'object' ? video.templateId?._id : (video.templateId || ""),
+                      templateType: typeof video.templateId === 'object' ? video.templateId?.templateType : (video.templateType || ""),
+                      thumbnail: video.thumbnail || ""
+                    }
+                  });
+                }}
+              >
                 <Ionicons name="eye-outline" size={18} color="#FFF" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconCircle}>
@@ -135,7 +178,12 @@ export default function ProfileScreen() {
             </View>
           </View>
         )}
-      </View>
+        {!isProcessing && !isImage && (
+           <View style={{position: 'absolute', top: '40%', left: '40%'}}>
+              <MaterialIcons name="play-circle-outline" size={40} color="#FFF" />
+           </View>
+        )}
+      </TouchableOpacity>
     );
   };
 
@@ -211,7 +259,7 @@ export default function ProfileScreen() {
                   style={styles.historyBtn}
                   onPress={() => router.push("/purchase-history")}
                 >
-                  <MaterialCommunityIcons name="history" size={24} color="rgba(255,255,255,0.6)" />
+                  <MaterialCommunityIcons name="history" size={21} color="rgba(255,255,255,0.6)" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -228,11 +276,11 @@ export default function ProfileScreen() {
                     colors={["#444", "#000"]}
                     style={[styles.tabGradient, styles.activeTabBorder]}
                   >
-                    <Text style={styles.activeTabText}>My Videos</Text>
+                    <Text style={styles.activeTabText}>My Creations</Text>
                   </LinearGradient>
                 ) : (
                   <View style={styles.inactiveTab}>
-                    <Text style={styles.inactiveTabText}>My Videos</Text>
+                    <Text style={styles.inactiveTabText}>My Creations</Text>
                   </View>
                 )}
               </TouchableOpacity>
@@ -270,7 +318,7 @@ export default function ProfileScreen() {
                 ListEmptyComponent={
                   !isGalleryLoading ? (
                     <View style={styles.emptyContainer}>
-                      <Text style={styles.emptyText}>No videos yet</Text>
+                      <Text style={styles.emptyText}>No creations yet</Text>
                     </View>
                   ) : (
                     <ActivityIndicator color="#FFF" style={{ marginTop: 20 }} />
@@ -328,8 +376,8 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   profileSection: {
-    paddingHorizontal: 20,
-    marginTop: 10,
+    paddingHorizontal: 15,
+    // marginTop: 10,
   },
   profileMain: {
     flexDirection: "row",
@@ -337,7 +385,7 @@ const styles = StyleSheet.create({
   },
   avatarWrapper: {
     width: 100,
-    height: 130,
+    height: 100,
     borderRadius: 16,
     overflow: "hidden",
     backgroundColor: "rgba(255,255,255,0.1)",
@@ -360,17 +408,17 @@ const styles = StyleSheet.create({
   profileInfo: {
     marginLeft: 20,
     flex: 1,
-    height: 130,
+    height: 100,
     justifyContent: "space-between",
-    paddingVertical: 5,
+    // paddingVertical: 5,
   },
   userName: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: 14,
+    fontWeight: "500",
     color: "#FFF",
   },
   userEmail: {
-    fontSize: 14,
+    fontSize: 12,
     color: "rgba(255,255,255,0.6)",
     marginTop: 2,
   },
@@ -382,21 +430,21 @@ const styles = StyleSheet.create({
   getCreditsBtn: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 8.5,
+    paddingVertical: 7,
   },
   getCreditsText: {
     color: "#FFF",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
     marginRight: 4,
   },
   balanceCard: {
     backgroundColor: "rgba(255,255,255,0.05)",
-    marginHorizontal: 20,
-    marginTop: 25,
-    borderRadius: 20,
-    padding: 20,
+    marginHorizontal: 15,
+    marginTop: 15,
+    borderRadius: 15,
+    padding: 15,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.1)",
   },
@@ -404,7 +452,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   balanceLabel: {
-    fontSize: 14,
+    fontSize: 11.5,
     color: "rgba(255,255,255,0.6)",
     fontWeight: "500",
   },
@@ -418,18 +466,18 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
   },
   balanceValue: {
-    fontSize: 36,
-    fontWeight: "bold",
+    fontSize: 26,
+    fontWeight: "500",
     color: "#FFF",
   },
   balanceUnit: {
-    fontSize: 14,
+    fontSize: 10,
     color: "rgba(255,255,255,0.6)",
     marginLeft: 8,
   },
   historyBtn: {
-    width: 45,
-    height: 45,
+    width: 35,
+    height: 35,
     borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.08)",
     justifyContent: "center",
@@ -438,8 +486,8 @@ const styles = StyleSheet.create({
   tabsContainer: {
     flexDirection: "row",
     width: "100%",
-    height: 50,
-    marginTop: 20,
+    height: 45,
+    marginTop: 15,
     marginBottom: 10,
   },
   tabItem: {
@@ -462,22 +510,22 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "700",
   },
   inactiveTabText: {
     color: "rgba(255,255,255,0.5)",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "600",
   },
   galleryGrid: {
     paddingHorizontal: 15,
-    paddingTop: 10,
-    paddingBottom: 30,
+    paddingTop: 5,
+    paddingBottom: 20,
   },
   galleryRow: {
     justifyContent: "space-between",
-    paddingHorizontal: 5,
+    // paddingHorizontal: 5,
   },
   videoCard: {
     width: ITEM_WIDTH,
@@ -520,8 +568,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 10,
-    backgroundColor: "rgba(0,0,0,0.3)",
+    // paddingHorizontal: 5,
+    paddingVertical: 5,
+    // backgroundColor: "rgba(0,0,0,0.3)",
   },
   actionButtons: {
     flexDirection: "row",
@@ -532,7 +581,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "rgb(59, 59, 59)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,

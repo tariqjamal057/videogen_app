@@ -15,6 +15,7 @@ interface PrimaryButtonProps {
   textStyle?: TextStyle;
   activeOpacity?: number;
   disabled?: boolean;
+  colors?: string[];
 }
 
 export default function PrimaryButton({
@@ -24,6 +25,7 @@ export default function PrimaryButton({
   textStyle,
   activeOpacity = 0.8,
   disabled = false,
+  colors = ["#002375", "#0047ED"],
 }: PrimaryButtonProps) {
   return (
     <TouchableOpacity
@@ -33,7 +35,7 @@ export default function PrimaryButton({
       style={[styles.container, style, disabled && styles.disabled]}
     >
       <LinearGradient
-        colors={["#002375", "#0047ED"]}
+        colors={colors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.button}

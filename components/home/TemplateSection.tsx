@@ -37,6 +37,7 @@ export default function TemplateSection({
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
         prompt: template.prompt,
+        templateType: template.templateType,
       },
     });
   };
@@ -71,6 +72,7 @@ export default function TemplateSection({
           onPress={() => handlePress(item)} 
           style={styles.useButton}
           textStyle={styles.useButtonText}
+          colors={item.templateType === "image" ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
         />
       </View>
     </TouchableOpacity>

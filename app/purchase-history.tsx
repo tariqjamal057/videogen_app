@@ -30,32 +30,33 @@ export default function TransactionHistoryScreen() {
   };
 
   const renderItem = ({ item }: { item: any }) => {
-    // Since we only have purchase data from the current API,
-    // we'll treat all of them as additions (green arrows).
-    // In a real scenario with usage data, we'd check the type.
-    const isAddition = true;
+    const isPurchase = item.type === "purchase";
+    const iconColor = isPurchase ? "#22C55E" : "#EF4444";
+    const iconBgColor = isPurchase ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)";
 
     return (
       <View style={styles.transactionRow}>
-        <View style={[styles.iconCircle, isAddition ? styles.iconCircleGreen : styles.iconCircleRed]}>
+        <View style={[styles.iconCircle, { backgroundColor: iconBgColor }]}>
           <MaterialIcons
-            name={isAddition ? "north-east" : "south-west"}
+            name="north-east"
             size={20}
-            color={isAddition ? "#22C55E" : "#EF4444"}
+            color={iconColor}
           />
         </View>
 
         <View style={styles.detailsContainer}>
           <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
-          <Text style={styles.creditsText}>{item.credits} credits</Text>
+          <Text style={styles.creditsText}>
+            {item.credits} credits
+          </Text>
         </View>
 
         <View style={styles.rightContainer}>
-          {item.amount > 0 ? (
+          {isPurchase ? (
             <Text style={styles.amountText}>₹{item.amount}</Text>
           ) : (
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>Video</Text>
+              <Text style={styles.badgeText}>{item.usageType}</Text>
             </View>
           )}
         </View>
@@ -89,7 +90,7 @@ export default function TransactionHistoryScreen() {
             ListEmptyComponent={
               <View style={styles.centerContainer}>
                 <Feather name="list" size={48} color="rgba(255,255,255,0.1)" />
-                <Text style={styles.emptyText}>No transactions found</Text>
+                <Text style={styles.emptyText}>No history found</Text>
               </View>
             }
           />
@@ -122,18 +123,11 @@ const styles = StyleSheet.create({
     borderBottomColor: "rgba(255,255,255,0.05)",
   },
   iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.05)",
-  },
-  iconCircleGreen: {
-    backgroundColor: "rgba(34, 197, 94, 0.1)",
-  },
-  iconCircleRed: {
-    backgroundColor: "rgba(239, 68, 68, 0.1)",
   },
   detailsContainer: {
     flex: 1,
@@ -145,7 +139,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   creditsText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
     color: "#FFF",
   },
@@ -153,12 +147,12 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   amountText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "700",
     color: "#FFF",
   },
   badge: {
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.08)",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 6,
@@ -166,7 +160,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.1)",
   },
   badgeText: {
-    fontSize: 12,
+    fontSize: 11,
     color: "rgba(255,255,255,0.7)",
     fontWeight: "500",
   },

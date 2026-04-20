@@ -162,6 +162,7 @@ export const apiSlice = createApi({
               ? t.image
               : `${FILE_BASE_URL}${t.image}`,
             inputType: t.inputType,
+            templateType: t.templateType || "video",
             inputCount: t.noOfInput,
             prompt: t.prompt || "",
           })),
@@ -184,6 +185,7 @@ export const apiSlice = createApi({
             ? t.image
             : `${FILE_BASE_URL}${t.image}`,
           inputType: t.inputType,
+          templateType: t.templateType || "video",
           inputCount: t.noOfInput,
           prompt: t.prompt || "",
         }));

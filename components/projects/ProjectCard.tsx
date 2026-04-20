@@ -16,6 +16,7 @@ interface Project {
   status: string;
   date: string;
   progress?: number;
+  isImage?: boolean;
 }
 
 interface ProjectCardProps {
@@ -28,6 +29,7 @@ export const ProjectCard = ({ project, onPress }: ProjectCardProps) => {
 
   useEffect(() => {
     async function loadThumbnail() {
+      if (project.isImage) return;
       // Always try to get a video frame for Completed projects for a premium look
       if (project.status === "Completed") {
         let sourceUrl = project.gifUrl || project.videoUrl;
@@ -52,7 +54,7 @@ export const ProjectCard = ({ project, onPress }: ProjectCardProps) => {
       }
     }
     loadThumbnail();
-  }, [project.videoUrl, project.gifUrl, project.status]);
+  }, [project.videoUrl, project.gifUrl, project.status, project.isImage]);
 
   const displayThumbnail = extractedThumb || project.thumbnail;
 
@@ -73,11 +75,13 @@ export const ProjectCard = ({ project, onPress }: ProjectCardProps) => {
               style={styles.placeholderIcon}
               resizeMode="contain"
             />
-            <MaterialIcons
-              name="play-arrow"
-              size={24}
-              color={Colors.dark.primary}
-            />
+            {!project.isImage && (
+              <MaterialIcons
+                name="play-arrow"
+                size={24}
+                color={Colors.dark.primary}
+              />
+            )}
           </View>
         )}
       </View>

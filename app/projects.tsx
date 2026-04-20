@@ -58,63 +58,75 @@ export default function ProjectsScreen() {
     }
   };
 
-  const renderItem = ({ item: project }: { item: any }) => (
-    <ProjectCard
-      key={project._id}
-      project={{
-        id: project.uuid,
-        title:
-          project.prompt ||
-          (typeof project.templateId === "object"
-            ? project.templateId?.name
-            : "Untitled Video"),
-        description:
-          typeof project.templateId === "object"
-            ? project.templateId?.description
-            : undefined,
-        thumbnail: project.inputImages[0],
-        videoUrl: project.url || undefined,
-        gifUrl: project.gifUrl || undefined,
-        status:
-          project.status === 2
-            ? "Completed"
-            : project.status === 3
-            ? "Failed"
-            : "Processing",
-        date: (() => {
-          const d = new Date(project.createdAt);
-          return `${String(d.getDate()).padStart(2, "0")}-${String(
-            d.getMonth() + 1
-          ).padStart(2, "0")}-${d.getFullYear()}`;
-        })(),
-        progress: project.progress,
-      }}
-      onPress={(id, extractedThumbnail) =>
-        router.push({
-          pathname: "/project/[id]",
-          params: {
-            id: id,
-            prompt:
-              project.prompt ||
-              (typeof project.templateId === "object"
-                ? project.templateId?.name
-                : ""),
-            status: project.status as any,
-            createdAt: project.createdAt,
-            inputImages: JSON.stringify(project.inputImages),
-            url: project.url || "",
-            gifUrl: project.gifUrl || "",
-            thumbnail: extractedThumbnail || project.thumbnail || "",
-            extractedThumbnail: extractedThumbnail || "",
-            templateId:
-              typeof project.templateId === "object"
-                ? project.templateId?._id
-                : project.templateId || "",
-          },
-        })
-      }
-    />
-  );
+  const renderItem = ({ item: project }: { item: any }) => {
+    const isImage = 
+      project.uuid?.startsWith("img_") || 
+      (typeof project.templateId === "object" && project.templateId?.templateType === "image") ||
+      project.templateType === "image";
+
+    return (
+      <ProjectCard
+        key={project._id}
+        project={{
+          id: project.uuid,
+          title:
+            project.prompt ||
+            (typeof project.templateId === "object"
+              ? project.templateId?.name
+              : "Untitled Video"),
+          description:
+            typeof project.templateId === "object"
+              ? project.templateId?.description
+              : undefined,
+          thumbnail: project.inputImages[0],
+          videoUrl: project.url || undefined,
+          gifUrl: project.gifUrl || undefined,
+          status:
+            project.status === 2
+              ? "Completed"
+              : project.status === 3
+              ? "Failed"
+              : "Processing",
+          date: (() => {
+            const d = new Date(project.createdAt);
+            return `${String(d.getDate()).padStart(2, "0")}-${String(
+              d.getMonth() + 1
+            ).padStart(2, "0")}-${d.getFullYear()}`;
+          })(),
+          progress: project.progress,
+          isImage: isImage,
+        }}
+        onPress={(id, extractedThumbnail) =>
+          router.push({
+            pathname: "/project/[id]",
+            params: {
+              id: id,
+              prompt:
+                project.prompt ||
+                (typeof project.templateId === "object"
+                  ? project.templateId?.name
+                  : ""),
+              status: project.status as any,
+              createdAt: project.createdAt,
+              inputImages: JSON.stringify(project.inputImages),
+              url: project.url || "",
+              gifUrl: project.gifUrl || "",
+              thumbnail: extractedThumbnail || project.thumbnail || "",
+              extractedThumbnail: extractedThumbnail || "",
+              templateId:
+                typeof project.templateId === "object"
+                  ? project.templateId?._id
+                  : project.templateId || "",
+              templateType:
+                typeof project.templateId === "object"
+                  ? project.templateId?.templateType
+                  : project.templateType || "",
+            },
+          })
+        }
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>

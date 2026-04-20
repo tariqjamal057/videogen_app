@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "211053888115-ftcgnls0jkjvddncc1slkjr2go3tt8lr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.videogen.app",
+            "certificate_hash": "0a7ec20b6289caa92cd177169529bf78e4b0ffac"
+          }
+        },
+        {
           "client_id": "211053888115-st6ee0mmsgp4ai6fr5otvleg3ncjmb5b.apps.googleusercontent.com",
           "client_type": 3
         }

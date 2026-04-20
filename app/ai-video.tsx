@@ -2,7 +2,7 @@ import GradientButton from "@/components/common/GradientButton";
 import HomeHeader from "@/components/home/HomeHeader";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,
@@ -38,6 +38,7 @@ const MIN_PROMPT_LENGTH = 60;
 export default function AIVideoScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { isImage } = useLocalSearchParams();
   const dispatch = useDispatch();
   const reduxPrompt = useSelector(selectCurrentPrompt);
   const [localPrompt, setLocalPrompt] = useState("");
@@ -60,6 +61,7 @@ export default function AIVideoScreen() {
         title: template.title,
         prompt: template.prompt,
         image: template.image,
+        templateType: template.templateType,
       },
     });
   };
@@ -86,19 +88,19 @@ export default function AIVideoScreen() {
 
       await generateVideo({
         body: formData,
-        params: { isAiVideoTab: "true" },
+        params: { isAiVideoTab: isImage === "true" ? "true" : "false" },
       }).unwrap();
 
       setLocalPrompt("");
       dispatch(setPrompt(""));
       router.push("/projects");
     } catch (error: any) {
-      console.error("Failed to generate video:", error);
+      console.error(`Failed to generate ${isImage === "true" ? "image" : "video"}:`, error);
 
       const errorMessage =
         error?.data?.msg ||
         error?.msg ||
-        "Failed to generate video. Please try again.";
+        `Failed to generate ${isImage === "true" ? "image" : "video"}. Please try again.`;
       const isInsufficientCredits = errorMessage
         .toLowerCase()
         .includes("credits");
@@ -188,7 +190,7 @@ export default function AIVideoScreen() {
 
         <View style={styles.footer}>
           <GradientButton
-            title={isGenerating ? "Creating..." : "Create"}
+            title={isGenerating ? "Creating..." : isImage === "true" ? "Generate Image" : "Generate Video"}
             onPress={handleCreate}
             activeOpacity={0.9}
             disabled={

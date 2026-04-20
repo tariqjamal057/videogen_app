@@ -24,7 +24,7 @@ function PromptDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const dispatch = useDispatch();
-  const { prompt, image } = useLocalSearchParams();
+  const { prompt, image, templateType } = useLocalSearchParams();
   const [imageLoaded, setImageLoaded] = React.useState(false);
   const handleCopy = async () => {
     try {
@@ -37,7 +37,7 @@ function PromptDetailScreen() {
 
   const handleUsePrompt = () => {
     dispatch(setPrompt(prompt as string));
-    router.replace("/ai-video");
+    router.replace({ pathname: "/ai-video", params: { isImage: templateType === "image" ? "true" : "false" } });
   };
 
   return (
@@ -90,7 +90,7 @@ function PromptDetailScreen() {
           onPress={handleUsePrompt}
         >
           <LinearGradient
-            colors={Colors.dark.buttonGradient as any}
+            colors={templateType === "image" ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.primaryGradient}
