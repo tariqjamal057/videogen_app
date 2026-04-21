@@ -8,19 +8,19 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_BASE_URL": "https://api.aivideogen.co.in"
+        "EXPO_PUBLIC_BASE_URL": "http://backend.clipzovideoai.com"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_BASE_URL": "https://api.aivideogen.co.in"
+        "EXPO_PUBLIC_BASE_URL": "http://backend.clipzovideoai.com"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_BASE_URL": "https://api.aivideogen.co.in"
+        "EXPO_PUBLIC_BASE_URL": "http://backend.clipzovideoai.com"
       }
     }
   },
