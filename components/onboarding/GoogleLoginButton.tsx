@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
   googleButton: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: Colors.dark.white,
     // height: 56,
     borderRadius: 28,
@@ -71,15 +72,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   googleIcon: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
   },
   buttonText: {
     color: Colors.dark.black,
-    fontSize: 12,
-    // fontWeight: "600",
-    flex: 1,
-    textAlign: "center",
-    marginRight: 24, // to center text relative to the whole button considering the icon
+    fontSize: 12.5,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    lineHeight: 15,
+    letterSpacing: 0,
+    marginLeft: 10,
   },
 });

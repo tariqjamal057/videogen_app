@@ -82,11 +82,11 @@ export default function TemplateSection({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.sectionTitle}>{title}</Text>
-        {onSeeAll && (
+        {/* {onSeeAll && (
           <TouchableOpacity onPress={onSeeAll} activeOpacity={0.7}>
             <Text style={styles.seeAll}>SEE ALL</Text>
           </TouchableOpacity>
-        )}
+        )} */}
       </View>
       <FlatList
         data={templates}

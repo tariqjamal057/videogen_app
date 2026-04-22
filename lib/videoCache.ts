@@ -1,11 +1,11 @@
 import * as FS from "expo-file-system/legacy";
 
 export const CAROUSEL_VIDEOS = [
-  "https://api.aivideogen.co.in/1.mp4",
-  "https://api.aivideogen.co.in/2.mp4",
-  "https://api.aivideogen.co.in/3.mp4",
-  "https://api.aivideogen.co.in/4.mp4",
-  "https://api.aivideogen.co.in/5.mp4",
+  "http://backend.clipzovideoai.com/1.mp4",
+  "http://backend.clipzovideoai.com/2.mp4",
+  "http://backend.clipzovideoai.com/3.mp4",
+  "http://backend.clipzovideoai.com/4.mp4",
+  "http://backend.clipzovideoai.com/5.mp4",
 ];
 
 const getFilenameFromUrl = (url: string) => {

@@ -120,14 +120,14 @@ export default function GenerationConfigScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
         <ScreenHeader 
           title={isImageGen ? "Generate an Image" : "Generate a Video"} 
-          renderRight={() => <UpgradeButton />}
+          renderRight={() => <UpgradeButton usePadding={false} />}
         />
         
         <KeyboardAvoidingView
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   mainGenerateText: {
     color: "#FFF",
     fontSize: 14,
-    paddingVertical: 9,
+    paddingVertical: 11.5,
     // fontWeight: "700",
 
   },

@@ -45,10 +45,10 @@ export default function DiscoverScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
 
       <View style={styles.fixedHeaderContainer}>
         <FeaturedCarousel data={topTemplates} isLoading={isLoadingTop} />

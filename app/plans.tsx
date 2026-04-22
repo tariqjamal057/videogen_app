@@ -20,6 +20,7 @@ import { useGetPlansQuery, useGetTopTemplatesQuery } from "../store/api/apiSlice
 import { useIAPFlow } from "../hooks/useIAP";
 import Toast from "react-native-toast-message";
 import { Skeleton } from "../components/common/Skeleton";
+import Carousel from "react-native-reanimated-carousel";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 50) / 2;
@@ -99,26 +100,34 @@ export default function SubscriptionScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
       <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <ScreenHeader title="Subscription" />
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {/* Top Slider */}
           <View style={styles.sliderContainer}>
-            <FlatList
-              data={topTemplates}
-              renderItem={renderSliderItem}
-              horizontal
-              pagingEnabled
-              snapToInterval={width * 0.6 + 20}
-              decelerationRate="fast"
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.sliderList}
-              keyExtractor={(item) => item.id}
+            <Carousel
+              loop
+              width={width * 0.75}
+              height={300}
+              autoPlay={true}
+              autoPlayInterval={3000}
+              data={topTemplates || []}
+              scrollAnimationDuration={1000}
+              style={{
+                width: width,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              renderItem={({ item }) => (
+                <View style={styles.sliderImageWrapper}>
+                  <Image source={{ uri: item.image }} style={styles.sliderImage} resizeMode="cover" />
+                </View>
+              )}
             />
           </View>
 
@@ -200,7 +209,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   sliderImageWrapper: {
-    width: width * 0.6,
+  width: width * 0.73,
     height: 260,
     borderRadius: 24,
     overflow: "hidden",
@@ -282,7 +291,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   purchaseBtnWrapper: {
-    height: 52,
+    height: 46,
     borderRadius: 26,
     overflow: "hidden",
   },
@@ -293,7 +302,6 @@ const styles = StyleSheet.create({
   },
   purchaseBtnText: {
     color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
   },
 });

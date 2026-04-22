@@ -209,10 +209,10 @@ export default function DiscoverScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
 
       <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <HomeHeader />

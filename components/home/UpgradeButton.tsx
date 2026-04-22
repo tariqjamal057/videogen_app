@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import Colors from "../../constants/Colors";
 import { selectCurrentUser } from "../../store/slices/authSlice";
 
-export default function UpgradeButton() {
+export default function UpgradeButton({ usePadding = true }: { usePadding?: boolean }) {
   const router = useRouter();
   const user = useSelector(selectCurrentUser);
 
@@ -17,7 +17,7 @@ export default function UpgradeButton() {
         colors={["#0044E0", "#F20165"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={styles.creditsBadge}
+        style={[styles.creditsBadge, { paddingVertical: usePadding ? 6 : 0 }]}
       >
         <FontAwesome5
           name="database"
@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
-    paddingVertical: 2,
     borderRadius: 20,
     shadowColor: Colors.dark.primary,
     shadowOffset: { width: 0, height: 2 },
@@ -49,6 +48,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 0.5,
     marginLeft: 5,
-    lineHeight: 18,
+    // lineHeight: 18,
   },
 });

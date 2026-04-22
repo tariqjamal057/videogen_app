@@ -153,10 +153,10 @@ export default function AIVideoScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
 
       <HomeHeader />
 

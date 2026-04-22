@@ -125,6 +125,7 @@ const toastStyles = StyleSheet.create({
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Molengo: "https://github.com/google/fonts/raw/main/ofl/molengo/Molengo-Regular.ttf",
     ...FontAwesome.font,
   });
 

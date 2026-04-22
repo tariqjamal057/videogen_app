@@ -102,10 +102,10 @@ App Version: ${Constants.expoConfig?.version || "1.0.0"}
 
   return (
     <View style={styles.container}>
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
 
       <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.header}>

@@ -189,10 +189,10 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
 
       <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <ScreenHeader title="My Profile" />
@@ -273,7 +273,7 @@ export default function ProfileScreen() {
               >
                 {activeTab === "videos" ? (
                   <LinearGradient
-                    colors={["#444", "#000"]}
+                    colors={["#000", "#444"]}
                     style={[styles.tabGradient, styles.activeTabBorder]}
                   >
                     <Text style={styles.activeTabText}>My Creations</Text>
@@ -292,7 +292,7 @@ export default function ProfileScreen() {
               >
                 {activeTab === "settings" ? (
                   <LinearGradient
-                    colors={["#444", "#000"]}
+                    colors={["#000", "#444"]}
                     style={[styles.tabGradient, styles.activeTabBorder]}
                   >
                     <Text style={styles.activeTabText}>Settings</Text>
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     // paddingVertical: 5,
   },
   userName: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "500",
     color: "#FFF",
   },
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTabBorder: {
-    borderBottomWidth: 2,
+    borderBottomWidth: 1.5,
     borderBottomColor: "#FFFFFF",
   },
   inactiveTab: {
@@ -595,14 +595,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 18,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.05)",
+    paddingVertical: 5.5,
+    // borderBottomWidth: 1,
+    // borderBottomColor: "rgba(255,255,255,0.05)",
   },
   settingLabel: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#FFF",
-    fontWeight: "500",
+    // fontWeight: "500",
+    fontFamily: "Molengo"
   },
   footerContainer: {
     position: "absolute",
@@ -615,7 +616,7 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     backgroundColor: "#FFF",
-    height: 52,
+    height: 43,
     borderRadius: 26,
     justifyContent: "center",
     alignItems: "center",
@@ -627,7 +628,7 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     color: "#000",
-    fontSize: 16,
+    fontSize: 14,
     // fontWeight: "700",
   },
   emptyContainer: {

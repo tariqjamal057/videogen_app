@@ -121,12 +121,24 @@ export default function TemplateUploadScreen() {
           </View>
         ) : (
           <View style={styles.placeholderContainer}>
-            <MaterialCommunityIcons 
-              name="image-outline" 
-              size={isSmall ? 30 : 60} 
-              color="rgba(255,255,255,0.6)" 
-            />
-            <Text style={[styles.uploadLabel, isSmall && { fontSize: 8 }]}>Image {index + 1}</Text>
+            {templateType === "image" ? (
+              <MaterialCommunityIcons
+                name="account"
+                size={isSmall ? 50 : 60}
+                color="rgba(255,255,255,0.6)"
+              />
+            ) : (
+              <>
+                <MaterialCommunityIcons
+                  name="image-outline"
+                  size={isSmall ? 30 : 60}
+                  color="rgba(255,255,255,0.6)"
+                />
+                <Text style={[styles.uploadLabel, isSmall && { fontSize: 8 }]}>
+                  Image {index + 1}
+                </Text>
+              </>
+            )}
           </View>
         )}
       </TouchableOpacity>
@@ -136,10 +148,10 @@ export default function TemplateUploadScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
       <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <ScreenHeader title={title as string} />
         
@@ -159,12 +171,16 @@ export default function TemplateUploadScreen() {
           <View style={styles.uploadSection}>
             {templateType === 'image' ? (
               <View style={styles.imageTypeContainer}>
-                <View>
+                <View style={{ alignItems: 'center' }}>
                   <Text style={styles.sectionLabel}>Use Image</Text>
                   {renderUploadBox(0, true)}
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.sectionLabel}>More images</Text>
+                  {relatedTemplates.length > 0 && (
+                    <View style={{ width: ITEM_WIDTH_SMALL, alignItems: 'center' }}>
+                      <Text style={styles.sectionLabel} numberOfLines={1}>More images</Text>
+                    </View>
+                  )}
                   <ScrollView 
                     horizontal 
                     showsHorizontalScrollIndicator={false} 

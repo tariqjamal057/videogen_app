@@ -161,10 +161,10 @@ export default function PlansScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
+      {/* <LinearGradient
         colors={[Colors.dark.gradientStart, Colors.dark.gradientEnd]}
         style={styles.background}
-      />
+      /> */}
 
       <View style={styles.safeArea}>
         <View style={styles.contentContainer}>
