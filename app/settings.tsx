@@ -1,17 +1,22 @@
-import { MaterialIcons, FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import Constants from "expo-constants";
 import * as Device from "expo-device";
+import * as FS from "expo-file-system/legacy";
 import { LinearGradient } from "expo-linear-gradient";
+import * as MediaLibrary from "expo-media-library";
 import { useRouter } from "expo-router";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   FlatList,
   Image,
   Linking,
-  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -20,18 +25,23 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
-import Colors from "../constants/Colors";
+import { ScreenHeader } from "../components/common/ScreenHeader";
 import { Links } from "../constants/Links";
 import { auth } from "../lib/firebase";
-import { useGetUserProfileQuery, useGetGalleryQuery, apiSlice } from "../store/api/apiSlice";
+import {
+  apiSlice,
+  useDeleteVideoMutation,
+  useGetGalleryQuery,
+  useGetUserProfileQuery,
+} from "../store/api/apiSlice";
 import {
   logout,
   selectCurrentUser,
   selectToken,
   setCredentials,
 } from "../store/slices/authSlice";
-import { ScreenHeader } from "../components/common/ScreenHeader";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 45) / 2;
@@ -42,6 +52,9 @@ export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState<"videos" | "settings">("videos");
   const storeUser = useSelector(selectCurrentUser);
   const token = useSelector(selectToken);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const [deleteVideo] = useDeleteVideoMutation();
 
   const {
     data: apiUser,
@@ -56,10 +69,13 @@ export default function ProfileScreen() {
     isLoading: isGalleryLoading,
     isFetching: isGalleryFetching,
     refetch: refetchGallery,
-  } = useGetGalleryQuery({ page: 1, limit: 20 }, {
-    skip: !token || activeTab !== "videos",
-    pollingInterval: activeTab === "videos" ? 10000 : 0,
-  });
+  } = useGetGalleryQuery(
+    { page: 1, limit: 20 },
+    {
+      skip: !token || activeTab !== "videos",
+      pollingInterval: activeTab === "videos" ? 10000 : 0,
+    },
+  );
 
   const user = apiUser || storeUser;
 
@@ -93,20 +109,105 @@ export default function ProfileScreen() {
     const email = "Samirmahi3101@gmail.com";
     const subject = "Help & Support - Clipzo";
     const body = `Hi Support Team,\n\n[Describe your issue]\n\nUser ID: ${user?.id}\nDevice: ${Device.brand} ${Device.modelName}\nOS: ${Device.osName} ${Device.osVersion}`;
-    Linking.openURL(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    Linking.openURL(
+      `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+    );
+  };
+
+  const handleDownload = async (url: string, isImage: boolean, id: string) => {
+    if (!url) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: `${isImage ? "Image" : "Video"} URL not found`,
+      });
+      return;
+    }
+
+    try {
+      setDownloadingId(id);
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        Toast.show({
+          type: "info",
+          text1: "Permission Denied",
+          text2: `We need permission to save ${isImage ? "images" : "videos"} to your gallery.`,
+        });
+        return;
+      }
+
+      const ext = isImage ? "webp" : "mp4";
+      const fileName = `${isImage ? "ImageGen" : "VideoGen"}_${Date.now()}.${ext}`;
+      const fileUri = (FS.documentDirectory || FS.cacheDirectory) + fileName;
+      const downloadResult = await FS.downloadAsync(url, fileUri);
+
+      if (downloadResult.status === 200) {
+        await MediaLibrary.saveToLibraryAsync(downloadResult.uri);
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: `${isImage ? "Image" : "Video"} saved to gallery!`,
+        });
+      } else {
+        throw new Error(`Failed to download ${isImage ? "image" : "video"}`);
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: `Failed to download ${isImage ? "image" : "video"}. Please try again.`,
+      });
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    Alert.alert(
+      "Delete Creation",
+      "Are you sure you want to delete this creation?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteVideo(id).unwrap();
+              Toast.show({
+                type: "success",
+                text1: "Deleted",
+                text2: "Creation has been removed.",
+              });
+              dispatch(apiSlice.util.invalidateTags(["Project"]));
+              refetchGallery();
+            } catch (error) {
+              console.error("Delete error:", error);
+              Toast.show({
+                type: "error",
+                text1: "Error",
+                text2: "Failed to delete creation.",
+              });
+            }
+          },
+        },
+      ],
+    );
   };
 
   const renderVideoItem = ({ item: video }: { item: any }) => {
     const isProcessing = video.status !== 2 && video.status !== 3;
     const progress = video.progress || 0;
-    const isImage = 
-      video.uuid?.startsWith("img_") || 
-      (typeof video.templateId === "object" && video.templateId?.templateType === "image") ||
+    const isImage =
+      video.uuid?.startsWith("img_") ||
+      (typeof video.templateId === "object" &&
+        video.templateId?.templateType === "image") ||
       video.templateType === "image";
 
     return (
-      <TouchableOpacity 
-        style={styles.videoCard} 
+      <TouchableOpacity
+        style={styles.videoCard}
         activeOpacity={0.9}
         onPress={() => {
           router.push({
@@ -119,38 +220,49 @@ export default function ProfileScreen() {
               inputImages: JSON.stringify(video.inputImages || []),
               url: video.url || "",
               gifUrl: video.gifUrl || "",
-              templateId: typeof video.templateId === 'object' ? video.templateId?._id : (video.templateId || ""),
-              templateType: typeof video.templateId === 'object' ? video.templateId?.templateType : (video.templateType || ""),
-              thumbnail: video.thumbnail || ""
-            }
+              templateId:
+                typeof video.templateId === "object"
+                  ? video.templateId?._id
+                  : video.templateId || "",
+              templateType:
+                typeof video.templateId === "object"
+                  ? video.templateId?.templateType
+                  : video.templateType || "",
+              thumbnail: video.thumbnail || "",
+            },
           });
         }}
       >
         <Image
-          source={{ uri: video.url || video.inputImages?.[0] || video.thumbnail }}
+          source={{
+            uri: video.url || video.inputImages?.[0] || video.thumbnail,
+          }}
           style={styles.videoThumbnail}
           resizeMode="cover"
+          blurRadius={isProcessing ? 20 : 0}
         />
-        
+
         {isProcessing ? (
           <View style={styles.processingOverlay}>
             <Text style={styles.progressText}>{progress}%</Text>
-            <View style={styles.progressBarContainer}>
-              <LinearGradient
-                colors={["#0044E0", "#F20165"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={[styles.progressBar, { width: `${progress}%` }]}
-              />
+            <View style={styles.progressBarWrapper}>
+              <View style={styles.progressBarBackground}>
+                <LinearGradient
+                  colors={["#0044E0", "#F20165"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.progressBarFill, { width: `${progress}%` }]}
+                />
+              </View>
             </View>
           </View>
         ) : (
           <View style={styles.actionOverlay}>
             <View style={styles.actionButtons}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.iconCircle}
                 onPress={() => {
-                   router.push({
+                  router.push({
                     pathname: "/project/[id]",
                     params: {
                       id: video._id,
@@ -160,28 +272,45 @@ export default function ProfileScreen() {
                       inputImages: JSON.stringify(video.inputImages || []),
                       url: video.url || "",
                       gifUrl: video.gifUrl || "",
-                      templateId: typeof video.templateId === 'object' ? video.templateId?._id : (video.templateId || ""),
-                      templateType: typeof video.templateId === 'object' ? video.templateId?.templateType : (video.templateType || ""),
-                      thumbnail: video.thumbnail || ""
-                    }
+                      templateId:
+                        typeof video.templateId === "object"
+                          ? video.templateId?._id
+                          : video.templateId || "",
+                      templateType:
+                        typeof video.templateId === "object"
+                          ? video.templateId?.templateType
+                          : video.templateType || "",
+                      thumbnail: video.thumbnail || "",
+                    },
                   });
                 }}
               >
                 <Ionicons name="eye-outline" size={18} color="#FFF" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconCircle}>
+              <TouchableOpacity
+                style={styles.iconCircle}
+                onPress={() => handleDelete(video._id)}
+              >
                 <Ionicons name="trash-outline" size={18} color="#FFF" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconCircle}>
-                <Ionicons name="download-outline" size={18} color="#FFF" />
+              <TouchableOpacity
+                style={styles.iconCircle}
+                onPress={() => handleDownload(video.url, isImage, video._id)}
+                disabled={downloadingId === video._id}
+              >
+                {downloadingId === video._id ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+                ) : (
+                  <Ionicons name="download-outline" size={18} color="#FFF" />
+                )}
               </TouchableOpacity>
             </View>
           </View>
         )}
         {!isProcessing && !isImage && (
-           <View style={{position: 'absolute', top: '40%', left: '40%'}}>
-              <MaterialIcons name="play-circle-outline" size={40} color="#FFF" />
-           </View>
+          <View style={{ position: "absolute", top: "40%", left: "40%" }}>
+            <MaterialIcons name="play-circle-outline" size={40} color="#FFF" />
+          </View>
         )}
       </TouchableOpacity>
     );
@@ -207,17 +336,24 @@ export default function ProfileScreen() {
                 tintColor="#FFF"
               />
             }
-            contentContainerStyle={{ paddingBottom: activeTab === "settings" ? 100 : 20 }}
+            contentContainerStyle={{
+              paddingBottom: activeTab === "settings" ? 100 : 20,
+            }}
           >
             {/* Profile Section */}
             <View style={styles.profileSection}>
               <View style={styles.profileMain}>
                 <View style={styles.avatarWrapper}>
                   {user?.profilePicture ? (
-                    <Image source={{ uri: user.profilePicture }} style={styles.avatar} />
+                    <Image
+                      source={{ uri: user.profilePicture }}
+                      style={styles.avatar}
+                    />
                   ) : (
                     <View style={styles.avatarPlaceholder}>
-                      <Text style={styles.avatarInitial}>{user?.name?.charAt(0)}</Text>
+                      <Text style={styles.avatarInitial}>
+                        {user?.name?.charAt(0)}
+                      </Text>
                     </View>
                   )}
                 </View>
@@ -226,8 +362,8 @@ export default function ProfileScreen() {
                     <Text style={styles.userName}>{user?.name || "User"}</Text>
                     <Text style={styles.userEmail}>{user?.email}</Text>
                   </View>
-                  <TouchableOpacity 
-                    activeOpacity={0.9} 
+                  <TouchableOpacity
+                    activeOpacity={0.9}
                     onPress={() => router.push("/plans")}
                     style={styles.getCreditsBtnWrapper}
                   >
@@ -238,7 +374,11 @@ export default function ProfileScreen() {
                       style={styles.getCreditsBtn}
                     >
                       <Text style={styles.getCreditsText}>Get Credits</Text>
-                      <MaterialIcons name="chevron-right" size={18} color="#FFF" />
+                      <MaterialIcons
+                        name="chevron-right"
+                        size={18}
+                        color="#FFF"
+                      />
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
@@ -255,11 +395,15 @@ export default function ProfileScreen() {
                   <Text style={styles.balanceValue}>{user?.credits ?? 0}</Text>
                   <Text style={styles.balanceUnit}>Credits</Text>
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.historyBtn}
                   onPress={() => router.push("/purchase-history")}
                 >
-                  <MaterialCommunityIcons name="history" size={21} color="rgba(255,255,255,0.6)" />
+                  <MaterialCommunityIcons
+                    name="history"
+                    size={21}
+                    color="rgba(255,255,255,0.6)"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -329,22 +473,47 @@ export default function ProfileScreen() {
               <View style={styles.settingsContainer}>
                 <TouchableOpacity style={styles.settingRow} onPress={() => {}}>
                   <Text style={styles.settingLabel}>Rate App</Text>
-                  <MaterialIcons name="chevron-right" size={24} color="rgba(255,255,255,0.5)" />
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={24}
+                    color="rgba(255,255,255,0.5)"
+                  />
                 </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.settingRow} onPress={handleSupport}>
+
+                <TouchableOpacity
+                  style={styles.settingRow}
+                  onPress={handleSupport}
+                >
                   <Text style={styles.settingLabel}>Help & Support</Text>
-                  <MaterialIcons name="chevron-right" size={24} color="rgba(255,255,255,0.5)" />
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={24}
+                    color="rgba(255,255,255,0.5)"
+                  />
                 </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.settingRow} onPress={() => Linking.openURL(Links.privacy)}>
+
+                <TouchableOpacity
+                  style={styles.settingRow}
+                  onPress={() => Linking.openURL(Links.privacy)}
+                >
                   <Text style={styles.settingLabel}>Privacy Policy</Text>
-                  <MaterialIcons name="chevron-right" size={24} color="rgba(255,255,255,0.5)" />
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={24}
+                    color="rgba(255,255,255,0.5)"
+                  />
                 </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.settingRow} onPress={() => Linking.openURL(Links.terms)}>
+
+                <TouchableOpacity
+                  style={styles.settingRow}
+                  onPress={() => Linking.openURL(Links.terms)}
+                >
                   <Text style={styles.settingLabel}>Terms of Services</Text>
-                  <MaterialIcons name="chevron-right" size={24} color="rgba(255,255,255,0.5)" />
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={24}
+                    color="rgba(255,255,255,0.5)"
+                  />
                 </TouchableOpacity>
               </View>
             )}
@@ -352,7 +521,11 @@ export default function ProfileScreen() {
 
           {activeTab === "settings" && (
             <View style={styles.footerContainer}>
-              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} activeOpacity={0.8}>
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+                activeOpacity={0.8}
+              >
                 <Text style={styles.logoutText}>Log Out</Text>
               </TouchableOpacity>
             </View>
@@ -547,21 +720,45 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   progressText: {
-    fontSize: 32,
+    fontSize: 46,
     fontWeight: "bold",
     color: "#FFF",
-    marginBottom: 15,
+    zIndex: 1,
   },
-  progressBarContainer: {
-    width: "100%",
-    height: 6,
+  progressBarWrapper: {
+    position: "absolute",
+    bottom: 15,
+    width: "85%",
+    alignSelf: "center",
+  },
+  progressBarBackground: {
+    height: 10,
     backgroundColor: "rgba(255,255,255,0.2)",
-    borderRadius: 3,
+    borderRadius: 5,
     overflow: "hidden",
   },
-  progressBar: {
+  progressBarFill: {
     height: "100%",
-    borderRadius: 3,
+    borderRadius: 5,
+  },
+  indicatorBox: {
+    width: 50,
+    height: 60,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.4)",
+    borderRadius: 6,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.1)",
+    overflow: "hidden",
+  },
+  indicatorFill: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#0044E0",
+    opacity: 0.6,
   },
   actionOverlay: {
     position: "absolute",
@@ -603,7 +800,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FFF",
     // fontWeight: "500",
-    fontFamily: "Molengo"
+    fontFamily: "Molengo",
   },
   footerContainer: {
     position: "absolute",

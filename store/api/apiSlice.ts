@@ -321,6 +321,12 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    deleteVideo: builder.mutation<any, string>({
+      query: (id) => ({
+        url: `users/videos/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -336,4 +342,5 @@ export const {
   useGetPurchaseHistoryQuery,
   useVerifyPurchaseMutation,
   useReportVideoMutation,
+  useDeleteVideoMutation,
 } = apiSlice;
