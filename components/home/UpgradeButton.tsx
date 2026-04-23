@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
   creditsBadge: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 12,
     borderRadius: 20,
     shadowColor: Colors.dark.primary,
@@ -43,10 +44,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   badgeText: {
+    fontSize: 13,
+    fontFamily: "Molengo",
+    fontWeight: "400",
     color: Colors.dark.white,
-    // fontWeight: "800",
-    fontSize: 10,
-    letterSpacing: 0.5,
     marginLeft: 5,
     // lineHeight: 18,
   },

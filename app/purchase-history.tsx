@@ -32,23 +32,19 @@ export default function TransactionHistoryScreen() {
   const renderItem = ({ item }: { item: any }) => {
     const isPurchase = item.type === "purchase";
     const iconColor = isPurchase ? "#22C55E" : "#EF4444";
-    const iconBgColor = isPurchase ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)";
+    const iconBgColor = isPurchase
+      ? "rgba(34, 197, 94, 0.1)"
+      : "rgba(239, 68, 68, 0.1)";
 
     return (
       <View style={styles.transactionRow}>
         <View style={[styles.iconCircle, { backgroundColor: iconBgColor }]}>
-          <MaterialIcons
-            name="north-east"
-            size={20}
-            color={iconColor}
-          />
+          <MaterialIcons name="north-east" size={20} color={iconColor} />
         </View>
 
         <View style={styles.detailsContainer}>
           <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
-          <Text style={styles.creditsText}>
-            {item.credits} credits
-          </Text>
+          <Text style={styles.creditsText}>{item.credits} credits</Text>
         </View>
 
         <View style={styles.rightContainer}>
@@ -134,22 +130,26 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   dateText: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.5)",
+    fontSize: 11,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#d0d0d0",
     marginBottom: 2,
   },
   creditsText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#FFF",
+    fontSize: 16,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   rightContainer: {
     alignItems: "flex-end",
   },
   amountText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFF",
+    fontSize: 20,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   badge: {
     backgroundColor: "rgba(255,255,255,0.08)",
@@ -161,12 +161,15 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    color: "rgba(255,255,255,0.7)",
-    fontWeight: "500",
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   emptyText: {
     marginTop: 15,
-    color: "rgba(255,255,255,0.4)",
-    fontSize: 16,
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#d0d0d0",
   },
 });

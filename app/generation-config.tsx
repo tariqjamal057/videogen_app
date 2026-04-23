@@ -21,12 +21,15 @@ import { ScreenHeader } from "../components/common/ScreenHeader";
 import UpgradeButton from "../components/home/UpgradeButton";
 import Colors from "../constants/Colors";
 import { Template } from "../constants/Templates";
-import { useGenerateVideoMutation, useGetTopTemplatesQuery } from "../store/api/apiSlice";
+import {
+  useGenerateVideoMutation,
+  useGetTopTemplatesQuery,
+} from "../store/api/apiSlice";
 import PrimaryButton from "../components/common/PrimaryButton";
 
 const { width } = Dimensions.get("window");
 const GRID_SPACING = 10;
-const ITEM_WIDTH = (width - 40 - (GRID_SPACING * 2)) / 3;
+const ITEM_WIDTH = (width - 40 - GRID_SPACING * 2) / 3;
 
 const surpriseMePrompts = [
   "A futuristic city with flying cars and neon lights",
@@ -39,25 +42,39 @@ const surpriseMePrompts = [
 export default function GenerationConfigScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { id, selectedImages: selectedImagesStr, prompt: initialPrompt, isImage, templateType } = params;
-  
+  const {
+    id,
+    selectedImages: selectedImagesStr,
+    prompt: initialPrompt,
+    isImage,
+    templateType,
+  } = params;
+
   const isImageGen = isImage === "true" || templateType === "image";
-  const selectedImages = JSON.parse(selectedImagesStr as string || "[]");
+  const selectedImages = JSON.parse((selectedImagesStr as string) || "[]");
   const [prompt, setPrompt] = useState((initialPrompt as string) || "");
   const [quality, setQuality] = useState<"Normal" | "High">("Normal");
-  const [duration, setDuration] = useState<"5 Sec" | "10 Sec" | "15 Sec">("10 Sec");
+  const [duration, setDuration] = useState<"5 Sec" | "10 Sec" | "15 Sec">(
+    "10 Sec",
+  );
 
-  const [generateVideo, { isLoading: isGenerating }] = useGenerateVideoMutation();
+  const [generateVideo, { isLoading: isGenerating }] =
+    useGenerateVideoMutation();
   const { data: topTemplates } = useGetTopTemplatesQuery({ limit: 6 });
 
   const handleSurpriseMe = () => {
-    const randomPrompt = surpriseMePrompts[Math.floor(Math.random() * surpriseMePrompts.length)];
+    const randomPrompt =
+      surpriseMePrompts[Math.floor(Math.random() * surpriseMePrompts.length)];
     setPrompt(randomPrompt);
   };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      Toast.show({ type: "error", text1: "Error", text2: "Please enter a prompt." });
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please enter a prompt.",
+      });
       return;
     }
 
@@ -88,11 +105,14 @@ export default function GenerationConfigScreen() {
         body: formData,
         params: { isAiVideoTab: isImageGen ? "true" : "false" },
       }).unwrap();
-      
+
       router.push("/projects");
     } catch (error: any) {
       console.error("Failed to generate:", error);
-      const errorMessage = error?.data?.msg || error?.msg || `Failed to generate ${isImageGen ? "image" : "video"}.`;
+      const errorMessage =
+        error?.data?.msg ||
+        error?.msg ||
+        `Failed to generate ${isImageGen ? "image" : "video"}.`;
       Toast.show({ type: "error", text1: "Error", text2: errorMessage });
     }
   };
@@ -125,16 +145,19 @@ export default function GenerationConfigScreen() {
         style={styles.background}
       /> */}
       <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-        <ScreenHeader 
-          title={isImageGen ? "Generate an Image" : "Generate a Video"} 
-          renderRight={() => <UpgradeButton usePadding={false} />}
+        <ScreenHeader
+          title={isImageGen ? "Generate an Image" : "Generate a Video"}
+          renderRight={() => <UpgradeButton />}
         />
-        
+
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
             <View style={styles.inputSection}>
               <Text style={styles.label}>Prompt</Text>
               <View style={styles.textAreaWrapper}>
@@ -147,7 +170,10 @@ export default function GenerationConfigScreen() {
                   onChangeText={setPrompt}
                   textAlignVertical="top"
                 />
-                <TouchableOpacity style={styles.surpriseMeButton} onPress={handleSurpriseMe}>
+                <TouchableOpacity
+                  style={styles.surpriseMeButton}
+                  onPress={handleSurpriseMe}
+                >
                   <Text style={styles.surpriseMeText}>🎲 Surprise Me</Text>
                 </TouchableOpacity>
               </View>
@@ -158,10 +184,22 @@ export default function GenerationConfigScreen() {
                   {["Normal", "High"].map((q) => (
                     <TouchableOpacity
                       key={q}
-                      style={[styles.btn, quality === q ? styles.btnActive : styles.btnInactive]}
+                      style={[
+                        styles.btn,
+                        quality === q ? styles.btnActive : styles.btnInactive,
+                      ]}
                       onPress={() => setQuality(q as any)}
                     >
-                      <Text style={[styles.btnText, quality === q ? styles.btnTextActive : styles.btnTextInactive]}>{q}</Text>
+                      <Text
+                        style={[
+                          styles.btnText,
+                          quality === q
+                            ? styles.btnTextActive
+                            : styles.btnTextInactive,
+                        ]}
+                      >
+                        {q}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -174,25 +212,49 @@ export default function GenerationConfigScreen() {
                     {["5 Sec", "10 Sec", "15 Sec"].map((t) => (
                       <TouchableOpacity
                         key={t}
-                        style={[styles.btn, duration === t ? styles.btnActive : styles.btnInactive]}
+                        style={[
+                          styles.btn,
+                          duration === t
+                            ? styles.btnActive
+                            : styles.btnInactive,
+                        ]}
                         onPress={() => setDuration(t as any)}
                       >
-                        <Text style={[styles.btnText, duration === t ? styles.btnTextActive : styles.btnTextInactive]}>{t}</Text>
+                        <Text
+                          style={[
+                            styles.btnText,
+                            duration === t
+                              ? styles.btnTextActive
+                              : styles.btnTextInactive,
+                          ]}
+                        >
+                          {t}
+                        </Text>
                       </TouchableOpacity>
                     ))}
                   </View>
                 </View>
               )}
 
-              <TouchableOpacity style={styles.mainGenerateButton} onPress={handleGenerate} disabled={isGenerating}>
+              <TouchableOpacity
+                style={styles.mainGenerateButton}
+                onPress={handleGenerate}
+                disabled={isGenerating}
+              >
                 <LinearGradient
-                  colors={isImageGen ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
+                  colors={
+                    isImageGen ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]
+                  }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.mainGenerateGradient}
                 >
                   <Text style={styles.mainGenerateText}>
-                    {isGenerating ? "Generating..." : (isImageGen ? "Generate Image" : "Generate Video")}
+                    {isGenerating
+                      ? "Generating..."
+                      : isImageGen
+                        ? "Generate Image"
+                        : "Generate Video"}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -200,9 +262,9 @@ export default function GenerationConfigScreen() {
 
             <View style={styles.trendingHeader}>
               <Text style={styles.trendingTitle}>Trending Templates</Text>
-              <TouchableOpacity onPress={() => {}}>
+              {/* <TouchableOpacity onPress={() => {}}>
                 <Text style={styles.seeAllText}>SEE ALL</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
 
             <FlatList
@@ -240,9 +302,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   label: {
-    fontSize: 14,
-    // fontWeight: "600",
-    color: "#FFF",
+    fontSize: 18,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
     marginBottom: 12,
   },
   textAreaWrapper: {
@@ -257,8 +320,10 @@ const styles = StyleSheet.create({
   textArea: {
     flex: 1,
     color: "#FFF",
-    fontSize: 12.5,
-    lineHeight: 20,
+    fontSize: 12,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    lineHeight: 23,
   },
   surpriseMeButton: {
     alignSelf: "flex-end",
@@ -269,8 +334,9 @@ const styles = StyleSheet.create({
   },
   surpriseMeText: {
     color: "#000",
-    fontSize: 10,
-    fontWeight: "700",
+    fontSize: 11,
+    fontFamily: "Molengo",
+    fontWeight: "400",
   },
   selectorRow: {
     flexDirection: "row",
@@ -279,9 +345,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   selectorLabel: {
-    fontSize: 13,
-    color: "#FFF",
-    // fontWeight: "500",
+    fontSize: 16,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
   },
   btnGroup: {
     flexDirection: "row",
@@ -299,8 +366,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.1)",
   },
   btnText: {
-    fontSize: 10,
-    // fontWeight: "600",
+   fontSize: 13,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
   },
   btnTextActive: {
     color: "#000",
@@ -321,10 +390,11 @@ const styles = StyleSheet.create({
   },
   mainGenerateText: {
     color: "#FFF",
-    fontSize: 14,
+    fontSize: 16,
+    fontFamily: "Molengo",
+    fontWeight: "400",
     paddingVertical: 11.5,
     // fontWeight: "700",
-
   },
   trendingHeader: {
     flexDirection: "row",
@@ -335,9 +405,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   trendingTitle: {
-    fontSize: 14,
-    color: "#FFF",
-    // fontWeight: "600",
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
   },
   seeAllText: {
     fontSize: 11,

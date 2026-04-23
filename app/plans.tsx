@@ -16,7 +16,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "../components/common/ScreenHeader";
 import Colors from "../constants/Colors";
-import { useGetPlansQuery, useGetTopTemplatesQuery } from "../store/api/apiSlice";
+import {
+  useGetPlansQuery,
+  useGetTopTemplatesQuery,
+} from "../store/api/apiSlice";
 import { useIAPFlow } from "../hooks/useIAP";
 import Toast from "react-native-toast-message";
 import { Skeleton } from "../components/common/Skeleton";
@@ -28,9 +31,10 @@ const ITEM_WIDTH = (width - 50) / 2;
 export default function SubscriptionScreen() {
   const router = useRouter();
   const { data: plans, isLoading: isLoadingPlans } = useGetPlansQuery();
-  const { data: topTemplates, isLoading: isLoadingTop } = useGetTopTemplatesQuery({ limit: 5 });
+  const { data: topTemplates, isLoading: isLoadingTop } =
+    useGetTopTemplatesQuery({ limit: 5 });
   const { handlePurchase } = useIAPFlow();
-  
+
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,7 +43,7 @@ export default function SubscriptionScreen() {
     }
   }, [plans]);
 
-  const selectedPlan = plans?.find(p => p.id === selectedPlanId);
+  const selectedPlan = plans?.find((p) => p.id === selectedPlanId);
 
   const onPurchase = async () => {
     if (!selectedPlan) {
@@ -93,7 +97,11 @@ export default function SubscriptionScreen() {
 
   const renderSliderItem = ({ item }: { item: any }) => (
     <View style={styles.sliderImageWrapper}>
-      <Image source={{ uri: item.image }} style={styles.sliderImage} resizeMode="cover" />
+      <Image
+        source={{ uri: item.image }}
+        style={styles.sliderImage}
+        resizeMode="cover"
+      />
     </View>
   );
 
@@ -107,7 +115,10 @@ export default function SubscriptionScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         <ScreenHeader title="Subscription" />
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           {/* Top Slider */}
           <View style={styles.sliderContainer}>
             <Carousel
@@ -125,7 +136,11 @@ export default function SubscriptionScreen() {
               }}
               renderItem={({ item }) => (
                 <View style={styles.sliderImageWrapper}>
-                  <Image source={{ uri: item.image }} style={styles.sliderImage} resizeMode="cover" />
+                  <Image
+                    source={{ uri: item.image }}
+                    style={styles.sliderImage}
+                    resizeMode="cover"
+                  />
                 </View>
               )}
             />
@@ -133,12 +148,14 @@ export default function SubscriptionScreen() {
 
           {/* Feature List */}
           <View style={styles.featuresContainer}>
-            {(selectedPlan?.bulletPoints || [
-              "Create viral AI Videos from your Photos",
-              "Swap your face in your dream look",
-              "Make your photos move like magic",
-              "Get 5 credits FREE"
-            ]).map((feature, index) => (
+            {(
+              selectedPlan?.bulletPoints || [
+                "Create viral AI Videos from your Photos",
+                "Swap your face in your dream look",
+                "Make your photos move like magic",
+                "Get 5 credits FREE",
+              ]
+            ).map((feature, index) => (
               <View key={index} style={styles.featureRow}>
                 <Ionicons name="checkmark" size={18} color="#FFF" />
                 <Text style={styles.featureText}>{feature}</Text>
@@ -150,8 +167,13 @@ export default function SubscriptionScreen() {
           <View style={styles.plansGridContainer}>
             {isLoadingPlans ? (
               <View style={styles.skeletonGrid}>
-                {[1, 2, 3, 4].map(i => (
-                  <Skeleton key={i} width={ITEM_WIDTH} height={100} borderRadius={16} />
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton
+                    key={i}
+                    width={ITEM_WIDTH}
+                    height={100}
+                    borderRadius={16}
+                  />
                 ))}
               </View>
             ) : (
@@ -169,8 +191,8 @@ export default function SubscriptionScreen() {
 
         {/* Purchase Button */}
         <View style={styles.footer}>
-          <TouchableOpacity 
-            activeOpacity={0.9} 
+          <TouchableOpacity
+            activeOpacity={0.9}
             onPress={onPurchase}
             style={styles.purchaseBtnWrapper}
           >
@@ -209,7 +231,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   sliderImageWrapper: {
-  width: width * 0.73,
+    width: width * 0.73,
     height: 260,
     borderRadius: 24,
     overflow: "hidden",
@@ -230,10 +252,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   featureText: {
-    color: "#FFF",
     fontSize: 14,
-    fontWeight: "500",
-    opacity: 0.9,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   plansGridContainer: {
     paddingHorizontal: 20,
@@ -270,13 +292,16 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.1)",
   },
   planPrice: {
-    color: "#FFF",
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   planCredits: {
-    color: "rgba(255,255,255,0.6)",
-    fontSize: 14,
+    fontSize: 18,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
     marginTop: 4,
   },
   skeletonGrid: {
@@ -301,7 +326,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   purchaseBtnText: {
-    color: "#FFF",
-    fontSize: 15,
+    fontSize: 16,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
 });

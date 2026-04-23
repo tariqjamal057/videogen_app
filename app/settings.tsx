@@ -324,7 +324,7 @@ export default function ProfileScreen() {
       /> */}
 
       <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-        <ScreenHeader title="My Profile" />
+        <ScreenHeader title="My Profile" showCredits={false} />
 
         <View style={{ flex: 1 }}>
           <ScrollView
@@ -557,9 +557,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   avatarWrapper: {
-    width: 100,
-    height: 100,
-    borderRadius: 16,
+    width: 95,
+    height: 93,
+    borderRadius: 10,
     overflow: "hidden",
     backgroundColor: "rgba(255,255,255,0.1)",
   },
@@ -586,13 +586,16 @@ const styles = StyleSheet.create({
     // paddingVertical: 5,
   },
   userName: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#FFF",
+    fontSize: 20,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   userEmail: {
     fontSize: 12,
-    color: "rgba(255,255,255,0.6)",
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#d0d0d0",
     marginTop: 2,
   },
   getCreditsBtnWrapper: {
@@ -608,8 +611,9 @@ const styles = StyleSheet.create({
   },
   getCreditsText: {
     color: "#FFF",
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: 10,
+    fontFamily: "Molengo",
+    fontWeight: "400",
     marginRight: 4,
   },
   balanceCard: {
@@ -625,9 +629,10 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   balanceLabel: {
-    fontSize: 11.5,
-    color: "rgba(255,255,255,0.6)",
-    fontWeight: "500",
+    fontSize: 12,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   balanceContent: {
     flexDirection: "row",
@@ -639,13 +644,17 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
   },
   balanceValue: {
-    fontSize: 26,
-    fontWeight: "500",
+    fontSize: 44,
+    fontFamily: "Molengo",
+    fontWeight: "400",
     color: "#FFF",
+    lineHeight: 37
   },
   balanceUnit: {
     fontSize: 10,
-    color: "rgba(255,255,255,0.6)",
+    color: "#d0d0d0",
+    fontFamily: "Molengo",
+    fontWeight: "400",
     marginLeft: 8,
   },
   historyBtn: {
@@ -682,14 +691,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTabText: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   inactiveTabText: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
   },
   galleryGrid: {
     paddingHorizontal: 15,
@@ -720,8 +731,8 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   progressText: {
-    fontSize: 46,
-    fontWeight: "bold",
+    fontSize: 52,
+    fontWeight: "800",
     color: "#FFF",
     zIndex: 1,
   },
@@ -833,7 +844,9 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   emptyText: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 16,
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#d0d0d0",
   },
 });

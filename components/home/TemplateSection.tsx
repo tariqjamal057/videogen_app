@@ -112,10 +112,11 @@ const styles = StyleSheet.create({
     marginBottom: 7,
   },
   sectionTitle: {
-    fontSize: 13,
-    // fontWeight: "600",
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
     color: Colors.dark.white,
-    letterSpacing: 0.5,
+    // letterSpacing: 0.5,
   },
   seeAll: {
     color: Colors.dark.textMuted,
@@ -150,12 +151,14 @@ const styles = StyleSheet.create({
     right: 0,
   },
   useButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 3.5,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
     borderRadius: 12,
   },
   useButtonText: {
-    fontSize: 8,
-    // lineHeight: 14,
+    fontSize: 9,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,    // lineHeight: 14,
   },
 });

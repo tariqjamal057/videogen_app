@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   avatarContainer: {
-    width: 32,
-    height: 32,
+    width: 35,
+    height: 35,
     borderRadius: 19,
     backgroundColor: "rgba(255,255,255,0.15)",
     justifyContent: "center",

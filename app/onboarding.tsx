@@ -188,7 +188,8 @@ const styles = StyleSheet.create({
   },
   footerText: {
     // marginTop: 10,
-    fontSize: 7,
+    fontFamily: "Molengo",
+    fontSize: 9,
     color: "rgba(255, 255, 255, 0.7)",
     textAlign: "center",
     paddingHorizontal: 20,

@@ -21,6 +21,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useGetTopTemplatesQuery } from "../store/api/apiSlice";
 import { Template } from "../constants/Templates";
 
+const videoPlaceholder = require("../assets/images/videoUploadPlaceholder.png");
+
 const { width, height } = Dimensions.get("window");
 const HORIZONTAL_PADDING = 12;
 const GAP = 10;
@@ -129,10 +131,13 @@ export default function TemplateUploadScreen() {
               />
             ) : (
               <>
-                <MaterialCommunityIcons
-                  name="image-outline"
-                  size={isSmall ? 30 : 60}
-                  color="rgba(255,255,255,0.6)"
+                <Image
+                  source={videoPlaceholder}
+                  style={[
+                    styles.placeholderImage,
+                    isSmall && { width: 30, height: 30 },
+                  ]}
+                  contentFit="contain"
                 />
                 <Text style={[styles.uploadLabel, isSmall && { fontSize: 8 }]}>
                   Image {index + 1}
@@ -276,10 +281,11 @@ const styles = StyleSheet.create({
     gap: GAP,
   },
   sectionLabel: {
-    color: "rgba(255,255,255,0.6)",
     fontSize: 10,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#fff",
     marginBottom: 6,
-    fontWeight: "500",
   },
   uploadGrid: {
     flexDirection: "row",
@@ -346,17 +352,25 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  placeholderImage: {
+    width: 60,
+    height: 60,
+    marginBottom: 8,
+  },
   uploadLabel: {
     color: "rgba(255,255,255,0.6)",
-    fontSize: 12,
-    fontWeight: "500",
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 23,
+    fontFamily: "Molengo",
   },
   hintText: {
-    fontSize: 8,
-    color: Colors.dark.textMuted,
+    fontSize: 10,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: "#D0D0D0",
     textAlign: "center",
     marginTop: 8,
-    lineHeight: 18,
     paddingHorizontal: 30,
   },
   footer: {
@@ -375,10 +389,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   generateButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 16,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
   },
   disabledButton: {
-    opacity: 0.5,
+    // opacity: 0.5,
   },
 });

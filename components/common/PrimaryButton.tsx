@@ -1,3 +1,4 @@
+import Colors from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
@@ -59,15 +60,14 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   button: {
-    paddingHorizontal: 10,
-    paddingVertical: 3.5,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
     borderRadius: 20,
   },
   buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 8,
-    // lineHeight: 16,
-    textAlign: "center",
+    fontSize: 9,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
   },
 });

@@ -10,7 +10,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Platform ,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../components/common/PrimaryButton";
@@ -24,13 +24,13 @@ import {
   useGetTemplatesByCategoryQuery,
   useGetTopTemplatesQuery,
 } from "../store/api/apiSlice";
-import * as NavigationBar from 'expo-navigation-bar';
-
+import * as NavigationBar from "expo-navigation-bar";
 
 const { width } = Dimensions.get("window");
 const COLUMN_COUNT = 3;
 const GRID_SPACING = 10;
-const ITEM_WIDTH = (width - 30 - (GRID_SPACING * (COLUMN_COUNT - 1))) / COLUMN_COUNT;
+const ITEM_WIDTH =
+  (width - 30 - GRID_SPACING * (COLUMN_COUNT - 1)) / COLUMN_COUNT;
 
 const CategorySkeleton = () => (
   <View style={{ marginBottom: 20 }}>
@@ -60,75 +60,77 @@ const CategorySkeleton = () => (
   </View>
 );
 
-const ListHeader = React.memo(({ 
-  topTemplates, 
-  isLoadingTop, 
-  activeTab, 
-  setActiveTab 
-}: { 
-  topTemplates: Template[] | undefined, 
-  isLoadingTop: boolean,
-  activeTab: "video" | "image",
-  setActiveTab: (tab: "video" | "image") => void
-}) => (
-  <View>
-    <View style={styles.carouselContainer}>
-      <FeaturedCarousel data={topTemplates} isLoading={isLoadingTop} />
-    </View>
+const ListHeader = React.memo(
+  ({
+    topTemplates,
+    isLoadingTop,
+    activeTab,
+    setActiveTab,
+  }: {
+    topTemplates: Template[] | undefined;
+    isLoadingTop: boolean;
+    activeTab: "video" | "image";
+    setActiveTab: (tab: "video" | "image") => void;
+  }) => (
+    <View>
+      <View style={styles.carouselContainer}>
+        <FeaturedCarousel data={topTemplates} isLoading={isLoadingTop} />
+      </View>
 
-    <View style={styles.trendingSection}>
-      <TemplateSection
-        title="Trending Templates"
-        templates={topTemplates || []}
-        onSeeAll={() => {}}
-      />
-    </View>
+      <View style={styles.trendingSection}>
+        <TemplateSection
+          title="Trending Templates"
+          templates={topTemplates || []}
+          onSeeAll={() => {}}
+        />
+      </View>
 
-    <View style={styles.tabsContainer}>
-      <TouchableOpacity
-        style={styles.tabItem}
-        onPress={() => setActiveTab("video")}
-        activeOpacity={1}
-      >
-        {activeTab === "video" ? (
-          <LinearGradient
-            colors={["#444", "#000"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={[styles.tabGradient, styles.activeTabBorder]}
-          >
-            <Text style={styles.activeTabText}>Video Templates</Text>
-          </LinearGradient>
-        ) : (
-          <View style={styles.inactiveTab}>
-            <Text style={styles.inactiveTabText}>Video Templates</Text>
-          </View>
-        )}
-      </TouchableOpacity>
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={styles.tabItem}
+          onPress={() => setActiveTab("video")}
+          activeOpacity={1}
+        >
+          {activeTab === "video" ? (
+            <LinearGradient
+              colors={["#000", "#444"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={[styles.tabGradient, styles.activeTabBorder]}
+            >
+              <Text style={styles.activeTabText}>Video Templates</Text>
+            </LinearGradient>
+          ) : (
+            <View style={styles.inactiveTab}>
+              <Text style={styles.inactiveTabText}>Video Templates</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.tabItem}
-        onPress={() => setActiveTab("image")}
-        activeOpacity={1}
-      >
-        {activeTab === "image" ? (
-          <LinearGradient
-            colors={["#444", "#000"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={[styles.tabGradient, styles.activeTabBorder]}
-          >
-            <Text style={styles.activeTabText}>Image Templates</Text>
-          </LinearGradient>
-        ) : (
-          <View style={styles.inactiveTab}>
-            <Text style={styles.inactiveTabText}>Image Templates</Text>
-          </View>
-        )}
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tabItem}
+          onPress={() => setActiveTab("image")}
+          activeOpacity={1}
+        >
+          {activeTab === "image" ? (
+            <LinearGradient
+              colors={["#000", "#444"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={[styles.tabGradient, styles.activeTabBorder]}
+            >
+              <Text style={styles.activeTabText}>Image Templates</Text>
+            </LinearGradient>
+          ) : (
+            <View style={styles.inactiveTab}>
+              <Text style={styles.inactiveTabText}>Image Templates</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
-));
+  ),
+);
 
 export default function DiscoverScreen() {
   const router = useRouter();
@@ -151,7 +153,7 @@ export default function DiscoverScreen() {
 
     const allTemplates = categories.flatMap((cat) => cat.templates);
     const filtered = allTemplates.filter((t) => t.templateType === activeTab);
-    
+
     return Array.from(new Map(filtered.map((t) => [t.id, t])).values());
   }, [categories, activeTab]);
 
@@ -195,12 +197,16 @@ export default function DiscoverScreen() {
         locations={[0.6, 1]}
       />
       <View style={styles.gridButtonContainer}>
-        <PrimaryButton 
-          title="USE" 
+        <PrimaryButton
+          title="USE"
           onPress={() => handleTemplatePress(item)}
           style={styles.useButton}
           textStyle={styles.useButtonText}
-          colors={item.templateType === "image" ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
+          colors={
+            item.templateType === "image"
+              ? ["#002375", "#0047ED"]
+              : ["#820036", "#FF006A"]
+          }
         />
       </View>
     </TouchableOpacity>
@@ -223,7 +229,7 @@ export default function DiscoverScreen() {
           keyExtractor={(item) => item.id}
           numColumns={COLUMN_COUNT}
           ListHeaderComponent={
-            <ListHeader 
+            <ListHeader
               topTemplates={topTemplates}
               isLoadingTop={isLoadingTop}
               activeTab={activeTab}
@@ -248,7 +254,12 @@ export default function DiscoverScreen() {
           <TouchableOpacity
             style={styles.footerButton}
             activeOpacity={0.9}
-            onPress={() => router.push({ pathname: "/generation-config", params: { isImage: "true" } })}
+            onPress={() =>
+              router.push({
+                pathname: "/generation-config",
+                params: { isImage: "true" },
+              })
+            }
           >
             <LinearGradient
               colors={["#002375", "#0047ED"]}
@@ -263,7 +274,12 @@ export default function DiscoverScreen() {
           <TouchableOpacity
             style={styles.footerButton}
             activeOpacity={0.9}
-            onPress={() => router.push({ pathname: "/generation-config", params: { isImage: "false" } })}
+            onPress={() =>
+              router.push({
+                pathname: "/generation-config",
+                params: { isImage: "false" },
+              })
+            }
           >
             <LinearGradient
               colors={["#820036", "#FF006A"]}
@@ -327,14 +343,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTabText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
   },
   inactiveTabText: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
   },
   listContent: {
     // paddingBottom handled inline
@@ -368,13 +386,15 @@ const styles = StyleSheet.create({
     right: -2,
   },
   useButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 3.5,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
     borderRadius: 12,
   },
   useButtonText: {
-    fontSize: 8,
-    // lineHeight: 14,
+    fontSize: 9,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
   },
   emptyContainer: {
     alignItems: "center",
@@ -409,13 +429,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 18,
     paddingVertical: 12,
   },
   footerButtonText: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: 15,
+    fontFamily: "Molengo",
+    fontWeight: "400",
+    color: Colors.dark.white,
     textAlign: "center",
   },
 });
