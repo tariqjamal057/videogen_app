@@ -1,5 +1,4 @@
 import {
-  Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
@@ -8,8 +7,12 @@ import * as Device from "expo-device";
 import * as FS from "expo-file-system/legacy";
 import { LinearGradient } from "expo-linear-gradient";
 import * as MediaLibrary from "expo-media-library";
+import * as VideoThumbnails from "expo-video-thumbnails";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
+import DeleteIcon from "../assets/images/delete.svg";
+import DownloadIcon from "../assets/images/download.svg";
+import ViewIcon from "../assets/images/view.svg";
 import {
   ActivityIndicator,
   Alert,
@@ -32,6 +35,7 @@ import { Links } from "../constants/Links";
 import { auth } from "../lib/firebase";
 import {
   apiSlice,
+  FILE_BASE_URL,
   useDeleteVideoMutation,
   useGetGalleryQuery,
   useGetUserProfileQuery,
@@ -45,6 +49,191 @@ import {
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = (width - 45) / 2;
+
+const VideoItem = ({
+  video,
+  handleDelete,
+  handleDownload,
+  downloadingId,
+}: {
+  video: any;
+  handleDelete: (id: string) => void;
+  handleDownload: (url: string, isImage: boolean, id: string) => void;
+  downloadingId: string | null;
+}) => {
+  const router = useRouter();
+  const [extractedThumb, setExtractedThumb] = useState<string | null>(null);
+  const isProcessing = video.status !== 2 && video.status !== 3;
+  const progress = Math.round(video.progress || 0);
+
+  const isImage =
+    video.uuid?.startsWith("img_") ||
+    (typeof video.templateId === "object" &&
+      video.templateId?.templateType === "image") ||
+    video.templateType === "image";
+
+  const getAbsoluteUrl = (url?: string) => {
+    if (!url) return undefined;
+    return url.startsWith("http") ? url : `${FILE_BASE_URL}${url}`;
+  };
+
+  const thumbUri = isImage
+    ? getAbsoluteUrl(video.url || video.thumbnail || video.inputImages?.[0])
+    : getAbsoluteUrl(video.thumbnail || video.inputImages?.[0] || video.url);
+
+  useEffect(() => {
+    async function loadThumbnail() {
+      if (isImage || isProcessing || video.status === 3) return;
+      // Only extract if we don't have a dedicated thumbnail and we have a video URL
+      if (video.status === 2 && !video.thumbnail && video.url) {
+        const absoluteUrl = getAbsoluteUrl(video.url);
+        if (absoluteUrl) {
+          try {
+            const { uri } = await VideoThumbnails.getThumbnailAsync(
+              absoluteUrl,
+              {
+                time: 0,
+              },
+            );
+            setExtractedThumb(uri);
+          } catch (e) {
+            console.warn("VideoItem: Error generating thumbnail", e);
+          }
+        }
+      }
+    }
+    loadThumbnail();
+  }, [video.url, video.status, video.thumbnail, isImage, isProcessing]);
+
+  const displayThumb = extractedThumb || thumbUri;
+
+  return (
+    <TouchableOpacity
+      style={styles.videoCard}
+      activeOpacity={0.9}
+      onPress={() => {
+        router.push({
+          pathname: "/project/[id]",
+          params: {
+            id: video._id,
+            prompt: video.prompt,
+            status: video.status.toString(),
+            createdAt: video.createdAt,
+            inputImages: JSON.stringify(video.inputImages || []),
+            url: video.url || "",
+            gifUrl: video.gifUrl || "",
+            templateId:
+              typeof video.templateId === "object"
+                ? video.templateId?._id
+                : video.templateId || "",
+            templateType:
+              typeof video.templateId === "object"
+                ? video.templateId?.templateType
+                : video.templateType || "",
+            thumbnail: video.thumbnail || "",
+          },
+        });
+      }}
+    >
+      {displayThumb && !(!isImage && !video.thumbnail && !extractedThumb) ? (
+        <Image
+          source={{ uri: displayThumb }}
+          style={styles.videoThumbnail}
+          resizeMode="cover"
+          blurRadius={isProcessing ? 20 : 0}
+        />
+      ) : (
+        <View
+          style={[
+            styles.videoThumbnail,
+            {
+              backgroundColor: "rgba(255,255,255,0.05)",
+              justifyContent: "center",
+              alignItems: "center",
+            },
+          ]}
+        >
+          <Image
+            source={require("../assets/images/CLIPZO Logo 2.png")}
+            style={{ width: 130, height: 130, opacity: 1 }}
+            resizeMode="contain"
+          />
+        </View>
+      )}
+
+      {isProcessing ? (
+        <View style={styles.processingOverlay}>
+          <Text style={styles.progressText}>{progress}%</Text>
+          <View style={styles.progressBarWrapper}>
+            <View style={styles.progressBarBackground}>
+              <LinearGradient
+                colors={["#0044E0", "#F20165"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[styles.progressBarFill, { width: `${progress}%` }]}
+              />
+            </View>
+          </View>
+        </View>
+      ) : (
+        <View style={styles.actionOverlay}>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={styles.iconCircle}
+              onPress={() => {
+                router.push({
+                  pathname: "/project/[id]",
+                  params: {
+                    id: video._id,
+                    prompt: video.prompt,
+                    status: video.status.toString(),
+                    createdAt: video.createdAt,
+                    inputImages: JSON.stringify(video.inputImages || []),
+                    url: video.url || "",
+                    gifUrl: video.gifUrl || "",
+                    templateId:
+                      typeof video.templateId === "object"
+                        ? video.templateId?._id
+                        : video.templateId || "",
+                    templateType:
+                      typeof video.templateId === "object"
+                        ? video.templateId?.templateType
+                        : video.templateType || "",
+                    thumbnail: video.thumbnail || "",
+                  },
+                });
+              }}
+            >
+              <ViewIcon width={18} height={18} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconCircle}
+              onPress={() => handleDelete(video._id)}
+            >
+              <DeleteIcon width={18} height={18} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.iconCircle}
+              onPress={() => handleDownload(video.url, isImage, video._id)}
+              disabled={downloadingId === video._id}
+            >
+              {downloadingId === video._id ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <DownloadIcon width={18} height={18} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {!isProcessing && !isImage && (
+        <View style={{ position: "absolute", top: "40%", left: "40%" }}>
+          <MaterialIcons name="play-circle-outline" size={40} color="#FFF" />
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -196,125 +385,14 @@ export default function ProfileScreen() {
     );
   };
 
-  const renderVideoItem = ({ item: video }: { item: any }) => {
-    const isProcessing = video.status !== 2 && video.status !== 3;
-    const progress = video.progress || 0;
-    const isImage =
-      video.uuid?.startsWith("img_") ||
-      (typeof video.templateId === "object" &&
-        video.templateId?.templateType === "image") ||
-      video.templateType === "image";
-
-    return (
-      <TouchableOpacity
-        style={styles.videoCard}
-        activeOpacity={0.9}
-        onPress={() => {
-          router.push({
-            pathname: "/project/[id]",
-            params: {
-              id: video._id,
-              prompt: video.prompt,
-              status: video.status.toString(),
-              createdAt: video.createdAt,
-              inputImages: JSON.stringify(video.inputImages || []),
-              url: video.url || "",
-              gifUrl: video.gifUrl || "",
-              templateId:
-                typeof video.templateId === "object"
-                  ? video.templateId?._id
-                  : video.templateId || "",
-              templateType:
-                typeof video.templateId === "object"
-                  ? video.templateId?.templateType
-                  : video.templateType || "",
-              thumbnail: video.thumbnail || "",
-            },
-          });
-        }}
-      >
-        <Image
-          source={{
-            uri: video.url || video.inputImages?.[0] || video.thumbnail,
-          }}
-          style={styles.videoThumbnail}
-          resizeMode="cover"
-          blurRadius={isProcessing ? 20 : 0}
-        />
-
-        {isProcessing ? (
-          <View style={styles.processingOverlay}>
-            <Text style={styles.progressText}>{progress}%</Text>
-            <View style={styles.progressBarWrapper}>
-              <View style={styles.progressBarBackground}>
-                <LinearGradient
-                  colors={["#0044E0", "#F20165"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={[styles.progressBarFill, { width: `${progress}%` }]}
-                />
-              </View>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.actionOverlay}>
-            <View style={styles.actionButtons}>
-              <TouchableOpacity
-                style={styles.iconCircle}
-                onPress={() => {
-                  router.push({
-                    pathname: "/project/[id]",
-                    params: {
-                      id: video._id,
-                      prompt: video.prompt,
-                      status: video.status.toString(),
-                      createdAt: video.createdAt,
-                      inputImages: JSON.stringify(video.inputImages || []),
-                      url: video.url || "",
-                      gifUrl: video.gifUrl || "",
-                      templateId:
-                        typeof video.templateId === "object"
-                          ? video.templateId?._id
-                          : video.templateId || "",
-                      templateType:
-                        typeof video.templateId === "object"
-                          ? video.templateId?.templateType
-                          : video.templateType || "",
-                      thumbnail: video.thumbnail || "",
-                    },
-                  });
-                }}
-              >
-                <Ionicons name="eye-outline" size={18} color="#FFF" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconCircle}
-                onPress={() => handleDelete(video._id)}
-              >
-                <Ionicons name="trash-outline" size={18} color="#FFF" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconCircle}
-                onPress={() => handleDownload(video.url, isImage, video._id)}
-                disabled={downloadingId === video._id}
-              >
-                {downloadingId === video._id ? (
-                  <ActivityIndicator size="small" color="#FFF" />
-                ) : (
-                  <Ionicons name="download-outline" size={18} color="#FFF" />
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-        {!isProcessing && !isImage && (
-          <View style={{ position: "absolute", top: "40%", left: "40%" }}>
-            <MaterialIcons name="play-circle-outline" size={40} color="#FFF" />
-          </View>
-        )}
-      </TouchableOpacity>
-    );
-  };
+  const renderVideoItem = ({ item: video }: { item: any }) => (
+    <VideoItem
+      video={video}
+      handleDelete={handleDelete}
+      handleDownload={handleDownload}
+      downloadingId={downloadingId}
+    />
+  );
 
   return (
     <View style={styles.container}>
@@ -331,7 +409,7 @@ export default function ProfileScreen() {
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
-                refreshing={isUserLoading || isGalleryFetching}
+                refreshing={isUserLoading}
                 onRefresh={handleRefresh}
                 tintColor="#FFF"
               />
@@ -744,7 +822,7 @@ const styles = StyleSheet.create({
   },
   progressBarBackground: {
     height: 10,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "#fff",
     borderRadius: 5,
     overflow: "hidden",
   },

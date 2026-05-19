@@ -48,6 +48,8 @@ export default function GenerationConfigScreen() {
     prompt: initialPrompt,
     isImage,
     templateType,
+    inputType,
+    image: templatePreviewImage,
   } = params;
 
   const isImageGen = isImage === "true" || templateType === "image";
@@ -84,6 +86,8 @@ export default function GenerationConfigScreen() {
       formData.append("prompt", prompt);
       formData.append("useOnlyPrompt", id ? "false" : "true");
       formData.append("quality", quality.toLowerCase());
+      formData.append("inputType", (inputType as string) || (isImageGen ? 'image' : 'text'));
+      
       if (!isImageGen) {
         formData.append("duration", duration.split(" ")[0]);
       }
@@ -92,10 +96,16 @@ export default function GenerationConfigScreen() {
         if (uri) {
           const fileName = uri.split("/").pop();
           const match = /\.(\w+)$/.exec(fileName || "");
-          const type = match ? `image/${match[1]}` : `image`;
+          let type = "";
+          if (inputType === 'video') {
+            type = match ? `video/${match[1]}` : `video/mp4`;
+          } else {
+            type = match ? `image/${match[1]}` : `image/jpeg`;
+          }
+          
           formData.append("files", {
             uri: Platform.OS === "android" ? uri : uri.replace("file://", ""),
-            name: fileName || `image_${index}.jpg`,
+            name: fileName || `${inputType === 'video' ? 'video' : 'image'}_${index}.${match ? match[1] : (inputType === 'video' ? 'mp4' : 'jpg')}`,
             type,
           } as any);
         }
@@ -106,7 +116,7 @@ export default function GenerationConfigScreen() {
         params: { isAiVideoTab: isImageGen ? "true" : "false" },
       }).unwrap();
 
-      router.push("/projects");
+      router.replace("/");
     } catch (error: any) {
       console.error("Failed to generate:", error);
       const errorMessage =
@@ -124,7 +134,12 @@ export default function GenerationConfigScreen() {
       onPress={() => {
         router.push({
           pathname: "/template-upload",
-          params: { ...item, inputCount: item.inputCount.toString() },
+          params: { 
+            ...item, 
+            inputCount: item.inputCount.toString(),
+            inputType: item.inputType,
+            templateType: item.templateType 
+          },
         });
       }}
     >
@@ -158,6 +173,19 @@ export default function GenerationConfigScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
           >
+            {/* {id && (
+              <View style={styles.previewSection}>
+                <Image
+                  source={{ uri: templatePreviewImage as string }}
+                  style={styles.previewImage}
+                  contentFit="cover"
+                />
+                <View style={styles.previewOverlay}>
+                   <Text style={styles.previewText}>Template Preview</Text>
+                </View>
+              </View>
+            )} */}
+
             <View style={styles.inputSection}>
               <Text style={styles.label}>Prompt</Text>
               <View style={styles.textAreaWrapper}>
@@ -298,6 +326,30 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 40,
   },
+  previewSection: {
+    width: "100%",
+    height: 250,
+    marginBottom: 20,
+    position: 'relative',
+  },
+  previewImage: {
+    width: "100%",
+    height: "100%",
+  },
+  previewOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 10,
+  },
+  previewText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontFamily: 'Molengo',
+    textAlign: 'center',
+  },
   inputSection: {
     paddingHorizontal: 15,
   },
@@ -323,7 +375,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Molengo",
     fontWeight: "400",
-    lineHeight: 23,
   },
   surpriseMeButton: {
     alignSelf: "flex-end",

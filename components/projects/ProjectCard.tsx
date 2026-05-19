@@ -9,7 +9,6 @@ import { StatusBadge } from "./StatusBadge";
 interface Project {
   id: string;
   title: string;
-  description?: string;
   thumbnail: string;
   videoUrl?: string;
   gifUrl?: string;
@@ -90,12 +89,6 @@ export const ProjectCard = ({ project, onPress }: ProjectCardProps) => {
         <Text style={styles.projectTitle} numberOfLines={1}>
           {project.title}
         </Text>
-
-        {project.description ? (
-          <Text style={styles.projectDescription} numberOfLines={1}>
-            {project.description}
-          </Text>
-        ) : null}
 
         <View style={styles.projectFooter}>
           <StatusBadge status={project.status} progress={project.progress} />

@@ -74,10 +74,6 @@ export default function ProjectsScreen() {
             (typeof project.templateId === "object"
               ? project.templateId?.name
               : "Untitled Video"),
-          description:
-            typeof project.templateId === "object"
-              ? project.templateId?.description
-              : undefined,
           thumbnail: project.inputImages[0],
           videoUrl: project.url || undefined,
           gifUrl: project.gifUrl || undefined,

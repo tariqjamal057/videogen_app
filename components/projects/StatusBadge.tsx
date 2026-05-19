@@ -55,7 +55,7 @@ export const StatusBadge = ({ status, progress }: StatusBadgeProps) => {
       />
       {status === "Processing" && progress !== undefined && (
         <Text style={[styles.progressText, { color: statusColor }]}>
-          {progress}%
+          {Math.round(progress)}%
         </Text>
       )}
     </View>

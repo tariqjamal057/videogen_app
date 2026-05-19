@@ -18,10 +18,9 @@ import Toast from "react-native-toast-message";
 import { ScreenHeader } from "../components/common/ScreenHeader";
 import Colors from "../constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useGetTopTemplatesQuery } from "../store/api/apiSlice";
+import { useGetTopTemplatesQuery, useGetTemplatesByCategoryQuery } from "../store/api/apiSlice";
 import { Template } from "../constants/Templates";
-
-const videoPlaceholder = require("../assets/images/videoUploadPlaceholder.png");
+import VideoUploadPlaceholder from "../assets/images/videoUploadPlaceholder.svg";
 
 const { width, height } = Dimensions.get("window");
 const HORIZONTAL_PADDING = 12;
@@ -31,13 +30,14 @@ const ITEM_WIDTH_SMALL = (width - (HORIZONTAL_PADDING * 2) - (GAP * 3)) / 4;
 export default function TemplateUploadScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { id, title, image, inputCount, templateType } = params;
+  const { id, title, image, inputCount, templateType, inputType, categoryId } = params;
 
   const count = parseInt(inputCount as string) || 1;
   const [selectedImages, setSelectedImages] = useState<string[]>(new Array(count).fill(""));
 
-  const { data: topTemplates } = useGetTopTemplatesQuery();
-  const relatedTemplates = topTemplates?.filter(t => t.templateType === 'image' && t.id !== id) || [];
+  const { data: categories } = useGetTemplatesByCategoryQuery();
+  const currentCategory = categories?.find(cat => cat.id === categoryId);
+  const relatedTemplates = currentCategory?.templates.filter(t => t.id !== id) || [];
 
   const handlePickImage = async (index: number) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -45,13 +45,13 @@ export default function TemplateUploadScreen() {
       Toast.show({
         type: "error",
         text1: "Permission Denied",
-        text2: "We need access to your gallery to upload images.",
+        text2: `We need access to your gallery to upload ${inputType === 'video' ? 'videos' : 'images'}.`,
       });
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: inputType === 'video' ? ["videos"] : ["images"],
       allowsEditing: false,
     });
 
@@ -75,7 +75,7 @@ export default function TemplateUploadScreen() {
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: `Please select ${count} image(s).`,
+        text2: `Please select ${count} ${inputType === 'video' ? 'video(s)' : 'image(s)'}.`,
       });
       return;
     }
@@ -95,12 +95,12 @@ export default function TemplateUploadScreen() {
       params: {
         id: template.id,
         title: template.title,
-        description: template.description,
         image: template.image,
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
         prompt: template.prompt,
         templateType: template.templateType,
+        categoryId: template.categoryId || "",
       },
     });
   };
@@ -116,7 +116,14 @@ export default function TemplateUploadScreen() {
       >
         {uri ? (
           <View style={styles.selectedImageContainer}>
-            <Image source={{ uri }} style={styles.selectedImage} />
+            {inputType === 'video' ? (
+               <View style={styles.selectedImage}>
+                  <MaterialCommunityIcons name="movie-play" size={40} color="#FFF" style={{alignSelf: 'center', marginTop: 10}} />
+                  <Text style={{color: '#FFF', fontSize: 10, textAlign: 'center'}} numberOfLines={1}>{uri.split('/').pop()}</Text>
+               </View>
+            ) : (
+              <Image source={{ uri }} style={styles.selectedImage} />
+            )}
             <View style={styles.removeBadge}>
               <MaterialCommunityIcons name="close" size={14} color="#FFF" />
             </View>
@@ -131,16 +138,13 @@ export default function TemplateUploadScreen() {
               />
             ) : (
               <>
-                <Image
-                  source={videoPlaceholder}
-                  style={[
-                    styles.placeholderImage,
-                    isSmall && { width: 30, height: 30 },
-                  ]}
-                  contentFit="contain"
+                <VideoUploadPlaceholder
+                  width={isSmall ? 30 : 60}
+                  height={isSmall ? 30 : 60}
+                  style={{ marginBottom: 8 }}
                 />
                 <Text style={[styles.uploadLabel, isSmall && { fontSize: 8 }]}>
-                  Image {index + 1}
+                  {inputType === 'video' ? 'Video' : 'Image'} {index + 1}
                 </Text>
               </>
             )}
@@ -177,13 +181,13 @@ export default function TemplateUploadScreen() {
             {templateType === 'image' ? (
               <View style={styles.imageTypeContainer}>
                 <View style={{ alignItems: 'center' }}>
-                  <Text style={styles.sectionLabel}>Use Image</Text>
+                  <Text style={styles.sectionLabel}>Use {inputType === 'video' ? 'Video' : 'Image'}</Text>
                   {renderUploadBox(0, true)}
                 </View>
                 <View style={{ flex: 1 }}>
                   {relatedTemplates.length > 0 && (
                     <View style={{ width: ITEM_WIDTH_SMALL, alignItems: 'center' }}>
-                      <Text style={styles.sectionLabel} numberOfLines={1}>More images</Text>
+                      <Text style={styles.sectionLabel} numberOfLines={1}>More templates</Text>
                     </View>
                   )}
                   <ScrollView 
@@ -215,7 +219,7 @@ export default function TemplateUploadScreen() {
             )}
             
             <Text style={styles.hintText}>
-              Upload your images in these boxes to create a {templateType === 'image' ? 'image' : 'video'} like this.
+              Upload your {inputType === 'video' ? 'videos' : 'images'} in these boxes to create a {templateType === 'image' ? 'image' : 'video'} like this.
             </Text>
           </View>
         </ScrollView>

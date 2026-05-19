@@ -1,5 +1,5 @@
 const rawBaseUrl =
-  process.env.EXPO_PUBLIC_BASE_URL || "http://backend.clipzovideoai.com";
+  process.env.EXPO_PUBLIC_BASE_URL || "https://backend.clipzovideoai.com";
 const BASE_URL = rawBaseUrl.endsWith("/") ? rawBaseUrl : `${rawBaseUrl}/`;
 
 export const Links = {

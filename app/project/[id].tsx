@@ -251,7 +251,7 @@ export default function ProjectDetailScreen() {
         text2: "Creation re-queued successfully.",
       });
 
-      router.push("/projects");
+      router.replace("/");
     } catch (error) {
       console.error("Retry error:", error);
       Toast.show({
@@ -311,7 +311,6 @@ export default function ProjectDetailScreen() {
         d.getMonth() + 1
       ).padStart(2, "0")}-${d.getFullYear()}`;
     })(),
-    description: currentDescription,
     sourceImages: currentInputImages.map((img: string) => {
       if (img && !img.startsWith("http")) {
         return `${FILE_BASE_URL}${img}`;
@@ -326,10 +325,6 @@ export default function ProjectDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={[Colors.dark.gradientSecondaryStart, Colors.dark.background]}
-        style={styles.background}
-      />
       <View style={[styles.safeArea, { paddingTop: insets.top }]}>
         <ScreenHeader
           title="Creation Details"
@@ -356,7 +351,8 @@ export default function ProjectDetailScreen() {
           contentContainerStyle={styles.scrollContent}
           style={styles.scroll}
         >
-          <ProjectVideoPreview
+          <View style={{paddingHorizontal: 16}}>
+            <ProjectVideoPreview
             thumbnail={mappedProject.thumbnail}
             mediaUrl={currentUrl}
             orientation={mappedProject.orientation as any}
@@ -364,6 +360,7 @@ export default function ProjectDetailScreen() {
             isFailed={mappedProject.isFailed}
             isImage={isImage}
           />
+          </View>
 
           <View style={styles.content}>
             <ProjectTitleSection
@@ -417,13 +414,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.dark.background,
-  },
-  background: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
   safeArea: {
     flex: 1,

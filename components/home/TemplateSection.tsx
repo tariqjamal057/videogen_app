@@ -32,12 +32,12 @@ export default function TemplateSection({
       params: {
         id: template.id,
         title: template.title,
-        description: template.description,
         image: template.image,
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
         prompt: template.prompt,
         templateType: template.templateType,
+        categoryId: template.categoryId || "",
       },
     });
   };

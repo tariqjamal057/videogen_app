@@ -6,6 +6,7 @@ import {
   Dimensions,
   FlatList,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { Template } from "../../constants/Templates";
@@ -49,18 +50,22 @@ export default function FeaturedCarousel({
       params: {
         id: template.id,
         title: template.title,
-        description: template.description,
         image: template.image,
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
         prompt: template.prompt,
         templateType: template.templateType,
+        categoryId: template.categoryId || "",
       },
     });
   };
 
   const renderItem = ({ item }: { item: Template }) => (
-    <View style={styles.card}>
+    <TouchableOpacity 
+      style={styles.card} 
+      activeOpacity={0.9} 
+      onPress={() => handlePress(item)}
+    >
       <Image
         source={{ uri: item.image }}
         style={styles.image}
@@ -79,7 +84,7 @@ export default function FeaturedCarousel({
           colors={item.templateType === "image" ? ["#002375", "#0047ED"] : ["#820036", "#FF006A"]}
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

@@ -91,7 +91,8 @@ export default function AIVideoScreen() {
 
       setLocalPrompt("");
       dispatch(setPrompt(""));
-      router.push("/(tabs)/projects");
+      
+      router.replace("/");
     } catch (error: any) {
       console.error("Failed to generate video:", error);
 

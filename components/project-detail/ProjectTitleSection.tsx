@@ -4,7 +4,6 @@ import Colors from "../../constants/Colors";
 
 interface ProjectTitleSectionProps {
   title: string;
-  description?: string;
   status: string;
   date: string;
   progress?: number;
@@ -15,7 +14,6 @@ export const ProjectTitleSection = ({
   status,
   date,
   progress,
-  description,
 }: ProjectTitleSectionProps) => {
   const isProcessing = status === "Processing";
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -51,9 +49,6 @@ export const ProjectTitleSection = ({
   return (
     <View style={styles.titleSection}>
       <Text style={styles.title}>{title}</Text>
-      {description ? (
-        <Text style={styles.description}>{description}</Text>
-      ) : null}
       <View style={styles.statusRow}>
         <View style={styles.statusBadge}>
           <Animated.View
@@ -72,7 +67,7 @@ export const ProjectTitleSection = ({
             ]}
           >
             {status}
-            {isProcessing && progress !== undefined ? ` ${progress}%` : ""}
+            {isProcessing && progress !== undefined ? ` ${Math.round(progress)}%` : ""}
           </Text>
         </View>
         <Text style={styles.dateText}>{date}</Text>

@@ -1,16 +1,18 @@
+import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import * as NavigationBar from "expo-navigation-bar";
 import { useRouter } from "expo-router";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Dimensions,
   FlatList,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../components/common/PrimaryButton";
@@ -24,7 +26,6 @@ import {
   useGetTemplatesByCategoryQuery,
   useGetTopTemplatesQuery,
 } from "../store/api/apiSlice";
-import * as NavigationBar from "expo-navigation-bar";
 
 const { width } = Dimensions.get("window");
 const COLUMN_COUNT = 3;
@@ -152,7 +153,12 @@ export default function DiscoverScreen() {
     if (!categories) return [];
 
     const allTemplates = categories.flatMap((cat) => cat.templates);
-    const filtered = allTemplates.filter((t) => t.templateType === activeTab);
+    const filtered = allTemplates.filter((t) => {
+      if (t.templateType !== activeTab) return false;
+      // For image templates, only show primary ones in the main grid
+      if (activeTab === "image" && t.isPrimary === false) return false;
+      return true;
+    });
 
     return Array.from(new Map(filtered.map((t) => [t.id, t])).values());
   }, [categories, activeTab]);
@@ -163,12 +169,12 @@ export default function DiscoverScreen() {
       params: {
         id: template.id,
         title: template.title,
-        description: template.description,
         image: template.image,
         inputType: template.inputType,
         inputCount: template.inputCount.toString(),
         prompt: template.prompt,
         templateType: template.templateType,
+        categoryId: template.categoryId || "",
       },
     });
   };
@@ -236,7 +242,7 @@ export default function DiscoverScreen() {
               setActiveTab={setActiveTab}
             />
           }
-          contentContainerStyle={[styles.listContent]}
+          contentContainerStyle={[styles.listContent, { paddingBottom: 100 }]}
           columnWrapperStyle={styles.columnWrapper}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
@@ -250,7 +256,14 @@ export default function DiscoverScreen() {
           }
         />
 
-        <View style={styles.floatingFooter}>
+        <BlurView intensity={1} tint="dark" style={styles.floatingFooter}>
+          <LinearGradient
+            colors={["#000000", "rgba(0, 0, 0, 0.7)", "rgba(0, 0, 0, 0)"]}
+            locations={[0, 0.5769, 1]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0, y: 0 }}
+            style={StyleSheet.absoluteFill}
+          />
           <TouchableOpacity
             style={styles.footerButton}
             activeOpacity={0.9}
@@ -290,7 +303,7 @@ export default function DiscoverScreen() {
               <Text style={styles.footerButtonText}>Generate a Video</Text>
             </LinearGradient>
           </TouchableOpacity>
-        </View>
+        </BlurView>
       </SafeAreaView>
     </View>
   );
@@ -406,12 +419,19 @@ const styles = StyleSheet.create({
   },
   floatingFooter: {
     position: "absolute",
-    bottom: 15,
-    left: 20,
-    right: 20,
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "transparent",
+    paddingLeft: 12,
+    paddingRight: 12,
+    paddingTop: 40,
+    paddingBottom: 15,
+    // borderRadius: 35,
+    overflow: "hidden",
+    // borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   footerButton: {
     flex: 1,

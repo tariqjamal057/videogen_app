@@ -68,7 +68,7 @@ export default function OnboardingScreen() {
       const credential = GoogleAuthProvider.credential(idToken);
       await signInWithCredential(auth, credential);
 
-      const firebaseToken = await auth.currentUser?.getIdToken();
+      const firebaseToken = await auth.currentUser?.getIdToken(true);
       if (!firebaseToken) {
         throw new Error("Failed to get Firebase token");
       }

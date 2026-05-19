@@ -69,7 +69,7 @@ export const ProjectVideoPreview = ({
 
   const effectiveAspectRatio =
     manualAspectRatio || (isPortrait ? 9 / 16 : 16 / 9);
-  const effectiveWidth = isPortrait ? "65%" : "92%";
+  const effectiveWidth = isImage ? "100%" : (isPortrait ? "65%" : "92%");
 
   const player = useVideoPlayer(null, (player) => {
     player.loop = false;
@@ -138,7 +138,7 @@ export const ProjectVideoPreview = ({
             <Image
               source={{ uri: currentThumbnail }}
               style={StyleSheet.absoluteFill}
-              resizeMode="cover"
+              resizeMode={isImage ? "contain" : "cover"}
             />
           ) : (
             <View

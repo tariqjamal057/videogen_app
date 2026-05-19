@@ -27,7 +27,7 @@ const TemplateDetailScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { id, title, description, image, inputType, inputCount } = params;
+  const { id, title, image, inputType, inputCount } = params;
 
   const count = parseInt(inputCount as string) || 1;
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -99,7 +99,7 @@ const TemplateDetailScreen = () => {
         body: formData,
         params: { isAiVideoTab: "false" },
       }).unwrap();
-      router.push("/projects");
+      router.replace("/");
     } catch (error: any) {
       console.error("Failed to generate video:", error);
 
@@ -171,7 +171,6 @@ const TemplateDetailScreen = () => {
 
           <View style={styles.content}>
             <Text style={styles.title}>{title}</Text>
-            <Text style={styles.description}>{description}</Text>
 
             <View style={styles.inputSection}>
               <CreationInputs

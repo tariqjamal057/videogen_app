@@ -191,7 +191,7 @@ function RootLayoutNav({ loaded }: { loaded: boolean }) {
   useEffect(() => {
     const unsubscribe = auth.onIdTokenChanged(async (user) => {
       if (user) {
-        const token = await user.getIdToken();
+        const token = await user.getIdToken(true);
         dispatch(setToken(token));
       } else {
         dispatch(logout());

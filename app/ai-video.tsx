@@ -93,7 +93,7 @@ export default function AIVideoScreen() {
 
       setLocalPrompt("");
       dispatch(setPrompt(""));
-      router.push("/projects");
+      router.replace("/");
     } catch (error: any) {
       console.error(`Failed to generate ${isImage === "true" ? "image" : "video"}:`, error);
 

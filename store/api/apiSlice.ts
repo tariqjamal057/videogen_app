@@ -157,7 +157,6 @@ export const apiSlice = createApi({
           templates: cat.templates.map((t: any) => ({
             id: t._id,
             title: t.name,
-            description: t.description,
             image: t.image.startsWith("http")
               ? t.image
               : `${FILE_BASE_URL}${t.image}`,
@@ -165,6 +164,8 @@ export const apiSlice = createApi({
             templateType: t.templateType || "video",
             inputCount: t.noOfInput,
             prompt: t.prompt || "",
+            categoryId: cat._id,
+            isPrimary: t.isPrimary,
           })),
         }));
       },
@@ -180,7 +181,6 @@ export const apiSlice = createApi({
         return response.data.map((t: any) => ({
           id: t._id,
           title: t.name,
-          description: t.description,
           image: t.image.startsWith("http")
             ? t.image
             : `${FILE_BASE_URL}${t.image}`,
@@ -326,6 +326,7 @@ export const apiSlice = createApi({
         url: `users/videos/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["Project"],
     }),
   }),
 });
