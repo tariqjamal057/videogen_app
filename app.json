@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "VideoGen",
-    "slug": "video-gen",
+    "name": "Clipzo",
+    "slug": "clipzo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/CLIPZO Logo 2.png",
-    "scheme": "videogen",
+    "scheme": "clipzo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {

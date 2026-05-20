@@ -8,7 +8,7 @@ export const OnboardingHeader = () => {
     <View style={styles.header}>
       <AppLogo containerStyle={{ marginBottom: 40 }} />
       <Text style={styles.title}>Welcome to</Text>
-      <Text style={styles.title}>VideoGen</Text>
+      <Text style={styles.title}>Clipzo</Text>
       <Text style={styles.subtitle}>
         Create stunning videos, animate old photos, and bring your memories to
         life.

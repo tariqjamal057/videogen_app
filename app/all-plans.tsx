@@ -50,7 +50,7 @@ const CarouselVideoItem = React.memo(
         try {
           const cached = await getCachedVideoUri(url);
           if (isMounted.current && cached !== url) {
-            player.replace(cached);
+            await player.replaceAsync(cached);
           }
         } catch (e) {}
       })();

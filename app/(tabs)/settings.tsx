@@ -69,7 +69,7 @@ export default function SettingsScreen() {
 
   const handleSupport = () => {
     const email = "Samirmahi3101@gmail.com";
-    const subject = "Help & Support - VideoGen";
+    const subject = "Help & Support - Clipzo";
     const deviceMsg = `
 ---
 User ID: ${user?.id || user?.authId || "N/A"}

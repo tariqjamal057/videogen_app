@@ -1,18 +1,12 @@
-import {
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as Device from "expo-device";
 import * as FS from "expo-file-system/legacy";
 import { LinearGradient } from "expo-linear-gradient";
 import * as MediaLibrary from "expo-media-library";
-import * as VideoThumbnails from "expo-video-thumbnails";
 import { useRouter } from "expo-router";
+import * as VideoThumbnails from "expo-video-thumbnails";
 import React, { useCallback, useEffect, useState } from "react";
-import DeleteIcon from "../assets/images/delete.svg";
-import DownloadIcon from "../assets/images/download.svg";
-import ViewIcon from "../assets/images/view.svg";
 import {
   ActivityIndicator,
   Alert,
@@ -30,6 +24,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
+import DeleteIcon from "../assets/images/delete.svg";
+import DownloadIcon from "../assets/images/download.svg";
+import ViewIcon from "../assets/images/view.svg";
 import { ScreenHeader } from "../components/common/ScreenHeader";
 import { Links } from "../constants/Links";
 import { auth } from "../lib/firebase";
@@ -131,6 +128,7 @@ const VideoItem = ({
                 ? video.templateId?.templateType
                 : video.templateType || "",
             thumbnail: video.thumbnail || "",
+            isImage: isImage.toString(),
           },
         });
       }}
@@ -200,6 +198,7 @@ const VideoItem = ({
                         ? video.templateId?.templateType
                         : video.templateType || "",
                     thumbnail: video.thumbnail || "",
+                    isImage: isImage.toString(),
                   },
                 });
               }}
@@ -265,6 +264,7 @@ export default function ProfileScreen() {
       pollingInterval: activeTab === "videos" ? 10000 : 0,
     },
   );
+  console.log("Videos list in my creatios ", videos);
 
   const user = apiUser || storeUser;
 
@@ -326,7 +326,7 @@ export default function ProfileScreen() {
       }
 
       const ext = isImage ? "webp" : "mp4";
-      const fileName = `${isImage ? "ImageGen" : "VideoGen"}_${Date.now()}.${ext}`;
+      const fileName = `${isImage ? "ImageGen" : "Clipzo"}_${Date.now()}.${ext}`;
       const fileUri = (FS.documentDirectory || FS.cacheDirectory) + fileName;
       const downloadResult = await FS.downloadAsync(url, fileUri);
 
@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
     fontFamily: "Molengo",
     fontWeight: "400",
     color: "#FFF",
-    lineHeight: 37
+    lineHeight: 37,
   },
   balanceUnit: {
     fontSize: 10,

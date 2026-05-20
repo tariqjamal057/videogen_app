@@ -59,6 +59,7 @@ export default function ProjectDetailScreen() {
     templateType: p_templateType,
     extractedThumbnail: p_extractedThumbnail,
     thumbnail: p_thumbnail,
+    isImage: p_isImage,
   } = useLocalSearchParams();
 
   // Let's re-read the state part carefully.
@@ -80,6 +81,8 @@ export default function ProjectDetailScreen() {
   }, [project?.status]);
 
   const isImage = React.useMemo(() => {
+    if (p_isImage === "true") return true;
+
     // 1. Check project data if available
     if (project) {
       if (project.uuid?.startsWith("img_")) return true;
@@ -92,7 +95,7 @@ export default function ProjectDetailScreen() {
     if (id?.toString().startsWith("img_")) return true;
 
     return false;
-  }, [project, p_templateType, id]);
+  }, [project, p_templateType, id, p_isImage]);
 
   // Use API data if available, otherwise fallback to navigation params
   const currentPrompt = project?.prompt || (p_prompt as string) || "";
@@ -158,7 +161,7 @@ export default function ProjectDetailScreen() {
       }
 
       const ext = isImage ? "webp" : "mp4";
-      const fileName = `${isImage ? "ImageGen" : "VideoGen"}_${Date.now()}.${ext}`;
+      const fileName = `${isImage ? "ImageGen" : "Clipzo"}_${Date.now()}.${ext}`;
       const fileUri = (FS.documentDirectory || FS.cacheDirectory) + fileName;
       const downloadResult = await FS.downloadAsync(currentUrl, fileUri);
 

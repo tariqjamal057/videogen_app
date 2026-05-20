@@ -1,16 +1,18 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useVideoPlayer, VideoView } from "expo-video";
 import * as VideoThumbnails from "expo-video-thumbnails";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSelector } from "react-redux";
 import Colors from "../../constants/Colors";
 import { FILE_BASE_URL } from "../../store/api/apiSlice";
+import { selectToken } from "../../store/slices/authSlice";
 
 interface ProjectVideoPreviewProps {
   thumbnail: string;
@@ -29,38 +31,70 @@ export const ProjectVideoPreview = ({
   isFailed,
   isImage,
 }: ProjectVideoPreviewProps) => {
+  const token = useSelector(selectToken);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
   const [extractedThumbnail, setExtractedThumbnail] = useState<string | null>(
     null
   );
 
+  // Ensure we have an absolute URL for the video/media
+  const absoluteMediaUrl = useMemo(() => {
+    if (!mediaUrl) return null;
+    if (mediaUrl.startsWith("http") || mediaUrl.startsWith("file://") || mediaUrl.startsWith("content://")) {
+      return mediaUrl;
+    }
+    return `${FILE_BASE_URL}${mediaUrl}`;
+  }, [mediaUrl]);
+
+  // Check if the URL is internal to our API/Fileserver
+  const isInternalUrl = useMemo(() => {
+    if (!absoluteMediaUrl) return false;
+    return absoluteMediaUrl.startsWith(FILE_BASE_URL);
+  }, [absoluteMediaUrl]);
+
+  // Construct the source object for expo-video
+  const videoSource = useMemo(() => {
+    if (!absoluteMediaUrl) return null;
+    
+    const headers: Record<string, string> = {};
+    // Only send Authorization header to our own server
+    if (token && isInternalUrl) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    
+    return {
+      uri: absoluteMediaUrl,
+      headers: Object.keys(headers).length > 0 ? headers : undefined,
+    };
+  }, [absoluteMediaUrl, token, isInternalUrl]);
+
   useEffect(() => {
     async function getThumbnail() {
-      if (isImage) return;
-      // Skip if already have a local extracted thumbnail or if failed
+      if (isImage || !absoluteMediaUrl || isFailed) return;
+      
+      // Skip if already have a local extracted thumbnail
       if (initialThumbnail?.startsWith("file://")) {
         return;
       }
 
-      if (mediaUrl && !isFailed) {
-        // Ensure absolute URL
-        const absoluteUrl = mediaUrl.startsWith("http")
-          ? mediaUrl
-          : `${FILE_BASE_URL}${mediaUrl}`;
-
-        try {
-          const { uri } = await VideoThumbnails.getThumbnailAsync(absoluteUrl, {
-            time: 0,
-          });
-          setExtractedThumbnail(uri);
-        } catch (e) {
-          console.warn("Error generating thumbnail:", e);
+      try {
+        const fetchHeaders: Record<string, string> = {};
+        if (token && isInternalUrl) {
+          fetchHeaders["Authorization"] = `Bearer ${token}`;
         }
+        
+        const { uri } = await VideoThumbnails.getThumbnailAsync(absoluteMediaUrl, {
+          time: 0,
+          headers: Object.keys(fetchHeaders).length > 0 ? fetchHeaders : undefined,
+        });
+        setExtractedThumbnail(uri);
+      } catch (e) {
+        console.warn("Error generating thumbnail:", e);
       }
     }
     getThumbnail();
-  }, [mediaUrl, isFailed, initialThumbnail, isImage]);
+  }, [absoluteMediaUrl, isFailed, initialThumbnail, isImage, token, isInternalUrl]);
 
   // Determine effective aspect ratio and width
   const isPortrait = manualAspectRatio
@@ -71,20 +105,29 @@ export const ProjectVideoPreview = ({
     manualAspectRatio || (isPortrait ? 9 / 16 : 16 / 9);
   const effectiveWidth = isImage ? "100%" : (isPortrait ? "65%" : "92%");
 
-  const player = useVideoPlayer(null, (player) => {
+  // Initialize player with the source if available to start preloading
+  const player = useVideoPlayer(videoSource, (player) => {
     player.loop = false;
   });
 
   useEffect(() => {
-    const subscription = player.addListener("playingChange", (payload) => {
+    const subscription = player.addListener("playingChange", (payload: { isPlaying: boolean }) => {
+      console.log("Playing change:", payload.isPlaying);
       if (payload.isPlaying) {
         setIsBuffering(false);
       }
     });
 
-    const statusSubscription = player.addListener("statusChange", (payload) => {
+    const statusSubscription = player.addListener("statusChange", (payload: { status: string; error?: any }) => {
+      console.log("Video player status changed:", payload.status);
       if (payload.status === "readyToPlay") {
         setIsBuffering(false);
+      } else if (payload.status === "loading") {
+        setIsBuffering(true);
+      } else if (payload.status === "error") {
+        console.error("Video player error details:", JSON.stringify(payload.error, null, 2));
+        setIsBuffering(false);
+        setIsPlaying(false);
       }
     });
 
@@ -94,15 +137,35 @@ export const ProjectVideoPreview = ({
     };
   }, [player]);
 
-  const handlePlay = () => {
-    if (!mediaUrl || isFailed || isImage) return;
+  const handlePlay = async () => {
+    if (!videoSource || isFailed || isImage) return;
+    
     setIsBuffering(true);
-    player.replace(mediaUrl);
     setIsPlaying(true);
-    player.play();
+    
+    try {
+      console.log("Attempting to play video with source:", JSON.stringify(videoSource));
+      // Use replaceAsync to avoid UI freezes and ensure proper async loading
+      await player.replaceAsync(videoSource);
+      player.play();
+    } catch (error) {
+      console.error("Error playing video:", error);
+      setIsBuffering(false);
+      setIsPlaying(false);
+    }
   };
 
   const currentThumbnail = extractedThumbnail || initialThumbnail;
+  
+  // Also ensure thumbnail is absolute if it's a remote path
+  const absoluteThumbnail = useMemo(() => {
+    if (!currentThumbnail) return null;
+    if (typeof currentThumbnail !== 'string') return currentThumbnail;
+    if (currentThumbnail.startsWith("http") || currentThumbnail.startsWith("file://") || currentThumbnail.startsWith("content://") || currentThumbnail.startsWith("data:")) {
+      return currentThumbnail;
+    }
+    return `${FILE_BASE_URL}${currentThumbnail}`;
+  }, [currentThumbnail]);
 
   return (
     <View
@@ -114,7 +177,7 @@ export const ProjectVideoPreview = ({
         },
       ]}
     >
-      {isPlaying && mediaUrl && !isFailed && !isImage ? (
+      {isPlaying && absoluteMediaUrl && !isFailed && !isImage ? (
         <View style={styles.preview}>
           <VideoView
             player={player}
@@ -134,11 +197,15 @@ export const ProjectVideoPreview = ({
         </View>
       ) : (
         <View style={styles.preview}>
-          {currentThumbnail ? (
+          {absoluteThumbnail ? (
             <Image
-              source={{ uri: currentThumbnail }}
+              source={{ 
+                uri: absoluteThumbnail,
+                headers: (token && isInternalUrl) ? { Authorization: `Bearer ${token}` } : {},
+              }}
               style={StyleSheet.absoluteFill}
-              resizeMode={isImage ? "contain" : "cover"}
+              contentFit={isImage ? "contain" : "cover"}
+              transition={300}
             />
           ) : (
             <View
@@ -154,7 +221,7 @@ export const ProjectVideoPreview = ({
               <Image
                 source={require("../../assets/images/small-icon.png")}
                 style={styles.placeholderIcon}
-                resizeMode="contain"
+                contentFit="contain"
               />
             </View>
           )}
@@ -163,7 +230,7 @@ export const ProjectVideoPreview = ({
               style={[styles.playOverlay, isFailed && styles.failedOverlay]}
               activeOpacity={0.8}
               onPress={handlePlay}
-              disabled={!mediaUrl || isFailed}
+              disabled={!absoluteMediaUrl || isFailed}
             >
               <View
                 style={[styles.playButton, isFailed && styles.failedPlayButton]}

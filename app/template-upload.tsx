@@ -37,7 +37,7 @@ export default function TemplateUploadScreen() {
 
   const { data: categories } = useGetTemplatesByCategoryQuery();
   const currentCategory = categories?.find(cat => cat.id === categoryId);
-  const relatedTemplates = currentCategory?.templates.filter(t => t.id !== id) || [];
+  const relatedTemplates = currentCategory?.templates.filter(t => t.id !== id && t.templateType === templateType) || [];
 
   const handlePickImage = async (index: number) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
